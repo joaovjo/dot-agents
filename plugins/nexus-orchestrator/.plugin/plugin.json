@@ -21,5 +21,6 @@
 	"skills": [
 		"./skills/memory-bank",
 		"./skills/sequential-thinking"
-	]
+	],
+	"hooks": "./hooks.json"
 }

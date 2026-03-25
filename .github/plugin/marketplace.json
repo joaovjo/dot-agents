@@ -12,7 +12,7 @@
             "name": "nexus-orchestrator",
             "description": "Five-agent workflow for orchestrated software delivery with orchestrator, thinker, planner, executor, and historian subagents.",
             "version": "1.0.0",
-            "source": "plugins/orchestrator"
+            "source": "plugins/nexus-orchestrator"
         }
     ]
 }

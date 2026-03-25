@@ -4,7 +4,7 @@
         "preToolUse": [
             {
                 "type": "command",
-                "command": "bun hooks/tool-guardian/guard-tool.ts",
+                "command": "node hooks/tool-guardian/guard-tool.mjs",
                 "timeoutSec": 10,
                 "env": {
                     "GUARD_MODE": "warn"

@@ -1,0 +1,13 @@
+{
+    "name": "nexus-orchestrator",
+    "version": "1.0.0",
+    "description": "Five-agent workflow for orchestrated software delivery with a user-facing orchestrator plus thinker, planner, executor, and historian subagents.",
+    "contextFileName": "GEMINI.md",
+    "plan": {
+        "directory": "conductor/plans"
+    },
+    "excludeTools": [
+        "run_shell_command(git push)",
+        "run_shell_command(git reset --hard)"
+    ]
+}

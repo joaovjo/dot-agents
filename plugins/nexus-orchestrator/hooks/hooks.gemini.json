@@ -1,0 +1,17 @@
+{
+    "hooks": {
+        "BeforeTool": [
+            {
+                "matcher": "run_shell_command",
+                "hooks": [
+                    {
+                        "name": "nexus-tool-guardian",
+                        "type": "command",
+                        "command": "node ${extensionPath}${/}hooks${/}tool-guardian${/}guard-tool.mjs",
+                        "timeout": 10000
+                    }
+                ]
+            }
+        ]
+    }
+}
