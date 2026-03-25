@@ -1,5 +1,5 @@
 {
-	"name": "teste-plugin",
+	"name": "nexus-orchestrator",
 	"description": "Five-agent workflow for orchestrated software delivery with a user-facing orchestrator plus thinker, planner, executor, and historian subagents.",
 	"version": "1.0.0",
 	"author": {
