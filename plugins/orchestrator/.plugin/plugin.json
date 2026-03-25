@@ -1,0 +1,25 @@
+{
+	"name": "teste-plugin",
+	"description": "Five-agent workflow for orchestrated software delivery with a user-facing orchestrator plus thinker, planner, executor, and historian subagents.",
+	"version": "1.0.0",
+	"author": {
+		"name": "Joao Vitor de Jesus Oliveira"
+	},
+	"repository": "https://github.com/joaovjo/dot-agents",
+	"license": "MIT",
+	"keywords": [
+		"agentic-workflow",
+		"orchestration",
+		"subagents",
+		"planning",
+		"execution",
+		"memory"
+	],
+	"agents": [
+		"./agents"
+	],
+	"skills": [
+		"./skills/memory-bank",
+		"./skills/sequential-thinking"
+	]
+}

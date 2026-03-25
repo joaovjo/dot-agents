@@ -1,0 +1,15 @@
+{
+    "version": 1,
+    "hooks": {
+        "preToolUse": [
+            {
+                "type": "command",
+                "command": "bun hooks/tool-guardian/guard-tool.ts",
+                "timeoutSec": 10,
+                "env": {
+                    "GUARD_MODE": "warn"
+                }
+            }
+        ]
+    }
+}

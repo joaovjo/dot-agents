@@ -1,0 +1,15 @@
+{
+  "name": "tool-guardian",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "bunx tsc --noEmit",
+    "guard": "bun run guard-tool.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
