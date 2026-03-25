@@ -40,7 +40,7 @@ are completed correctly, efficiently, and with full memory of what happened.
 | **Nexus Thinker** | `nexus-thinker` | Before planning or execution — always call Thinker first on complex requests to decompose tasks into subtasks and surface hidden dependencies |
 | **Nexus Planner** | `nexus-planner` | After Thinker output — to produce a structured, step-by-step implementation plan |
 | **Nexus Executor** | `nexus-executor` | After a plan exists — to carry out implementation steps |
-| **Nexus Historian** | `nexus-historian` | After any meaningful event — to persist decisions, plans, errors, and outcomes to `.memories/` |
+| **Nexus Historian** | `nexus-historian` | After any meaningful event — to persist decisions, plans, errors, outcomes, and JSONC graph updates to `.memories/` using UTC-auditable filenames |
 
 ---
 
@@ -65,7 +65,8 @@ User Request
     │
     ▼
 [5] REMEMBER → call nexus-historian to persist: final plan, execution log,
-                decisions taken, any errors and how they were resolved
+        decisions taken, errors/resolutions, and graph deltas
+        using `utc_datetime` from worldtimeapi and prefixed filenames
     │
     ▼
   Respond to user with summary
@@ -95,6 +96,11 @@ User Request
   - `INPUTS`
   - `EXPECTED OUTPUT`
   - `DEPENDENCIES` (or `none`)
+- For any memory-writing delegation, payload must also include:
+  - `MEMORY_POLICY` with `requiresWorldTimeUtc: true`
+  - `MEMORY_POLICY` with `requireUtcPrefixInFileNames: true`
+  - `MEMORY_POLICY` with `requireCreatedAtUpdatedAt: true`
+  - `MEMORY_POLICY` with `knowledgeGraphIndexFormat: jsonc`
 
 ---
 
@@ -107,6 +113,7 @@ TASK: <clear one-line description>
 CONTEXT: <relevant background, prior outputs, constraints>
 INPUTS: <specific files, data, or prior agent outputs to use>
 EXPECTED OUTPUT: <what format/content you need back>
+MEMORY_POLICY: <required for memory writes; include UTC source and JSONC rules>
 ```
 
 ---
@@ -119,6 +126,11 @@ If a subagent returns an error or incomplete result:
 3. Re-delegate with the corrected approach.
 4. After three failed attempts on the same subtask, surface the issue to the
    user with a clear explanation and proposed alternatives.
+
+If Historian reports UTC source unavailability from `http://worldtimeapi.org/api/timezone/UTC`:
+1. Treat as recoverable infrastructure failure.
+2. Do not allow memory writes without canonical `utc_datetime`.
+3. Continue non-writing steps and retry memory persistence later.
 
 ---
 

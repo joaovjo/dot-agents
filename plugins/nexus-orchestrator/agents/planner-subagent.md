@@ -82,8 +82,15 @@ Always produce plans in the following format:
   that can run in parallel, mark them with `[PARALLEL-GROUP: N]` so the
   Orchestrator knows to spawn concurrent Executors.
 - **Write to file when appropriate.** For large plans, write the plan to
-  `.memories/plans/<task-slug>-plan.md` using the `edit` tool, and reference
-  the file path in your response to the Orchestrator.
+  `.memories/plans/<UTC_PREFIX>__<task-slug>__plan.md` using the `edit` tool,
+  and reference the file path in your response to the Orchestrator.
+- **Auditable plan writes.** Before writing any plan file in `.memories/`,
+  fetch `utc_datetime` from `http://worldtimeapi.org/api/timezone/UTC`,
+  normalize prefix to `YYYY-MM-DDTHH-MM-SSZ`, and use intention-revealing
+  filenames.
+- **Metadata discipline.** For plan files in `.memories/`, include
+  `created_at` and `updated_at` in YAML frontmatter. Preserve `created_at`
+  on updates and refresh `updated_at` with the current canonical UTC value.
 
 ---
 

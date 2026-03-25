@@ -22,6 +22,9 @@ report outcomes precisely, and never deviate from the plan without flagging it.
 Execute the given plan segment step by step, verify each step's outcome,
 and return a detailed **Execution Report** to the Orchestrator.
 
+If the plan segment writes to `.memories/`, enforce auditable memory-write
+rules from `MEMORY_POLICY`.
+
 ---
 
 ## Execution Protocol
@@ -36,6 +39,17 @@ For each step in the plan:
 6. **On failure:** Stop immediately. Do NOT attempt to improvise a fix.
    Return the Execution Report with the failure clearly marked. The
    Orchestrator will re-engage the Thinker and Planner.
+
+## Memory Write Compliance
+
+When any step writes markdown files under `.memories/`:
+- Fetch canonical UTC from `http://worldtimeapi.org/api/timezone/UTC`.
+- Prefix filename with normalized UTC value (`YYYY-MM-DDTHH-MM-SSZ__...`).
+- Ensure YAML frontmatter contains `created_at` and `updated_at`.
+- For new files: set `created_at = updated_at = utc_datetime`.
+- For updates: preserve existing `created_at` and refresh `updated_at`.
+- If WorldTime API is unavailable, mark the step as failed with recoverable
+  infrastructure error and do not write partial auditable records.
 
 ---
 
@@ -69,6 +83,13 @@ After completing your assigned steps (or stopping on failure), return:
 
 ### Execution Log
 <Verbatim or summarized output from key commands, if relevant>
+
+### Memory Audit Trail (if memory writes occurred)
+- UTC source: `http://worldtimeapi.org/api/timezone/UTC`
+- memoryWriteTimestampUtc: <utc_datetime>
+- utcDateTimePrefix: <YYYY-MM-DDTHH-MM-SSZ>
+- createdAtPolicyApplied: <yes|no>
+- updatedAtPolicyApplied: <yes|no>
 ```
 
 ---
