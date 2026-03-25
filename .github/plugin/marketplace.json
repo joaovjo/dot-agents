@@ -1,0 +1,18 @@
+{
+    "name": "dot-agents-marketplace",
+    "owner": {
+        "name": "Joao Vitor de Jesus Oliveira"
+    },
+    "metadata": {
+        "description": "Marketplace de plugins para fluxos orquestrados com subagentes.",
+        "version": "1.0.0"
+    },
+    "plugins": [
+        {
+            "name": "teste-plugin",
+            "description": "Five-agent workflow for orchestrated software delivery with orchestrator, thinker, planner, executor, and historian subagents.",
+            "version": "1.0.0",
+            "source": "plugins/orchestrator"
+        }
+    ]
+}
