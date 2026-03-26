@@ -26,6 +26,7 @@ type Manifest = {
 };
 
 type Marketplace = {
+    name: string;
     metadata: {
         version: string;
     };
@@ -63,11 +64,32 @@ function errorMessage(error: unknown): string {
     return String(error);
 }
 
+function validateMarketplaceEntry(marketplace: Marketplace, pluginName: string, label: string): void {
+    const pluginEntry = (marketplace.plugins || []).find((entry) => entry.name === pluginName);
+    assert(Boolean(pluginEntry), `${label} entry not found for ${pluginName}`);
+    const checkedPluginEntry = pluginEntry as Marketplace["plugins"][number];
+
+    assert(
+        checkedPluginEntry.source === "./plugins/nexus-orchestrator",
+        `${label} source must be ./plugins/nexus-orchestrator`
+    );
+}
+
 async function validateRequiredFiles(): Promise<void> {
     for (const fileRelativePath of requiredFiles) {
         const absolutePath = joinPath(pluginRoot, fileRelativePath);
         const exists = await Bun.file(absolutePath).exists();
         assert(exists, `Missing required file: ${fileRelativePath}`);
+    }
+
+    const marketplaceFiles = [
+        joinPath(rootDir, ".claude-plugin", "marketplace.json"),
+        joinPath(rootDir, ".github", "plugin", "marketplace.json")
+    ];
+
+    for (const filePath of marketplaceFiles) {
+        const exists = await Bun.file(filePath).exists();
+        assert(exists, `Missing required marketplace file: ${relativePath(rootDir, filePath)}`);
     }
 }
 
@@ -75,17 +97,27 @@ async function validateManifestVersions(): Promise<void> {
     const copilot = await readJson<Manifest>(joinPath(pluginRoot, ".plugin", "plugin.json"));
     const claude = await readJson<Manifest>(joinPath(pluginRoot, ".claude-plugin", "plugin.json"));
     const gemini = await readJson<Manifest>(joinPath(pluginRoot, "gemini-extension.json"));
-    const marketplace = await readJson<Marketplace>(joinPath(rootDir, ".github", "plugin", "marketplace.json"));
+    const claudeMarketplace = await readJson<Marketplace>(joinPath(rootDir, ".claude-plugin", "marketplace.json"));
+    const copilotMarketplace = await readJson<Marketplace>(joinPath(rootDir, ".github", "plugin", "marketplace.json"));
 
-    const pluginEntry = (marketplace.plugins || []).find((entry) => entry.name === copilot.name);
-    assert(Boolean(pluginEntry), `Marketplace entry not found for ${copilot.name}`);
-    const checkedPluginEntry = pluginEntry as Marketplace["plugins"][number];
+    validateMarketplaceEntry(claudeMarketplace, copilot.name, "Claude marketplace");
+    validateMarketplaceEntry(copilotMarketplace, copilot.name, "Copilot marketplace");
 
-    assert(checkedPluginEntry.source === "plugins/nexus-orchestrator", "Marketplace source must be plugins/nexus-orchestrator");
     assert(copilot.version === claude.version, "Copilot and Claude versions must match");
     assert(copilot.version === gemini.version, "Copilot and Gemini versions must match");
-    assert(copilot.version === checkedPluginEntry.version, "Copilot and marketplace plugin versions must match");
-    assert(copilot.version === marketplace.metadata.version, "Copilot and marketplace metadata versions must match");
+    assert(copilot.version === claudeMarketplace.metadata.version, "Copilot and Claude marketplace metadata versions must match");
+    assert(copilot.version === copilotMarketplace.metadata.version, "Copilot and Copilot marketplace metadata versions must match");
+
+    const claudePluginEntry = claudeMarketplace.plugins.find((entry) => entry.name === copilot.name);
+    const copilotPluginEntry = copilotMarketplace.plugins.find((entry) => entry.name === copilot.name);
+
+    assert(Boolean(claudePluginEntry), `Claude marketplace entry not found for ${copilot.name}`);
+    assert(Boolean(copilotPluginEntry), `Copilot marketplace entry not found for ${copilot.name}`);
+
+    assert(copilot.version === (claudePluginEntry as Marketplace["plugins"][number]).version, "Copilot and Claude marketplace plugin versions must match");
+    assert(copilot.version === (copilotPluginEntry as Marketplace["plugins"][number]).version, "Copilot and Copilot marketplace plugin versions must match");
+
+    assert(claudeMarketplace.name === copilotMarketplace.name, "Claude and Copilot marketplace names must match");
 }
 
 async function validateHookCommands(): Promise<void> {
