@@ -19,6 +19,7 @@ async function cleanDirectory(targetPath: string): Promise<void> {
 
 async function copyPath(sourceRelative: string, targetAbsolute: string): Promise<void> {
     const sourceAbsolute = `${pluginDir}/${sourceRelative}`;
+    await $`mkdir -p ${parentDir(targetAbsolute)}`;
     await $`cp -R ${sourceAbsolute} ${targetAbsolute}`;
 }
 
