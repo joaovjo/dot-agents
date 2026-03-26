@@ -1,0 +1,10 @@
+{
+    "commands": [
+        {
+            "name": "nexus",
+            "description": "Five-agent workflow for orchestrated software delivery with orchestrator, thinker, planner, executor, and historian subagents.",
+            "action": "agent",
+            "agent": "orchestrator"
+        }
+    ]
+}

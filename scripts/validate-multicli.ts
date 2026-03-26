@@ -6,10 +6,13 @@ const pluginRoot = `${rootDir}/plugins/nexus-orchestrator`;
 const requiredFiles = [
     ".plugin/plugin.json",
     ".claude-plugin/plugin.json",
+    ".qwen-code/manifest.json",
+    ".qwen-code/commands.json",
     "gemini-extension.json",
     "hooks.json",
     "hooks/hooks.gemini.json",
     "hooks/hooks.claude.json",
+    "hooks/hooks.qwen.json",
     "hooks/tool-guardian/guard-tool.mjs",
     "agents/orchestrator.md",
     "agents/thinker-subagent.md",
@@ -84,7 +87,8 @@ async function validateRequiredFiles(): Promise<void> {
 
     const marketplaceFiles = [
         joinPath(rootDir, ".claude-plugin", "marketplace.json"),
-        joinPath(rootDir, ".github", "plugin", "marketplace.json")
+        joinPath(rootDir, ".github", "plugin", "marketplace.json"),
+        joinPath(rootDir, ".qwen-code", "marketplace.json")
     ];
 
     for (const filePath of marketplaceFiles) {
@@ -97,33 +101,43 @@ async function validateManifestVersions(): Promise<void> {
     const copilot = await readJson<Manifest>(joinPath(pluginRoot, ".plugin", "plugin.json"));
     const claude = await readJson<Manifest>(joinPath(pluginRoot, ".claude-plugin", "plugin.json"));
     const gemini = await readJson<Manifest>(joinPath(pluginRoot, "gemini-extension.json"));
+    const qwen = await readJson<Manifest>(joinPath(pluginRoot, ".qwen-code", "manifest.json"));
     const claudeMarketplace = await readJson<Marketplace>(joinPath(rootDir, ".claude-plugin", "marketplace.json"));
     const copilotMarketplace = await readJson<Marketplace>(joinPath(rootDir, ".github", "plugin", "marketplace.json"));
+    const qwenMarketplace = await readJson<Marketplace>(joinPath(rootDir, ".qwen-code", "marketplace.json"));
 
     validateMarketplaceEntry(claudeMarketplace, copilot.name, "Claude marketplace");
     validateMarketplaceEntry(copilotMarketplace, copilot.name, "Copilot marketplace");
+    validateMarketplaceEntry(qwenMarketplace, copilot.name, "Qwen marketplace");
 
     assert(copilot.version === claude.version, "Copilot and Claude versions must match");
     assert(copilot.version === gemini.version, "Copilot and Gemini versions must match");
+    assert(copilot.version === qwen.version, "Copilot and Qwen versions must match");
     assert(copilot.version === claudeMarketplace.metadata.version, "Copilot and Claude marketplace metadata versions must match");
     assert(copilot.version === copilotMarketplace.metadata.version, "Copilot and Copilot marketplace metadata versions must match");
+    assert(copilot.version === qwenMarketplace.metadata.version, "Copilot and Qwen marketplace metadata versions must match");
 
     const claudePluginEntry = claudeMarketplace.plugins.find((entry) => entry.name === copilot.name);
     const copilotPluginEntry = copilotMarketplace.plugins.find((entry) => entry.name === copilot.name);
+    const qwenPluginEntry = qwenMarketplace.plugins.find((entry) => entry.name === copilot.name);
 
     assert(Boolean(claudePluginEntry), `Claude marketplace entry not found for ${copilot.name}`);
     assert(Boolean(copilotPluginEntry), `Copilot marketplace entry not found for ${copilot.name}`);
+    assert(Boolean(qwenPluginEntry), `Qwen marketplace entry not found for ${copilot.name}`);
 
     assert(copilot.version === (claudePluginEntry as Marketplace["plugins"][number]).version, "Copilot and Claude marketplace plugin versions must match");
     assert(copilot.version === (copilotPluginEntry as Marketplace["plugins"][number]).version, "Copilot and Copilot marketplace plugin versions must match");
+    assert(copilot.version === (qwenPluginEntry as Marketplace["plugins"][number]).version, "Copilot and Qwen marketplace plugin versions must match");
 
     assert(claudeMarketplace.name === copilotMarketplace.name, "Claude and Copilot marketplace names must match");
+    assert(claudeMarketplace.name === qwenMarketplace.name, "Claude and Qwen marketplace names must match");
 }
 
 async function validateHookCommands(): Promise<void> {
     const copilotHooks = await readJson<{ hooks?: { preToolUse?: Array<{ command?: string }> } }>(joinPath(pluginRoot, "hooks.json"));
     const claudeHooks = await readJson<{ hooks?: { PreToolUse?: Array<{ hooks?: Array<{ command?: string }> }> } }>(joinPath(pluginRoot, "hooks", "hooks.claude.json"));
     const geminiHooks = await readJson<{ hooks?: { BeforeTool?: Array<{ hooks?: Array<{ command?: string }> }> } }>(joinPath(pluginRoot, "hooks", "hooks.gemini.json"));
+    const qwenHooks = await readJson<{ hooks?: { BeforeTool?: Array<{ hooks?: Array<{ command?: string }> }> } }>(joinPath(pluginRoot, "hooks", "hooks.qwen.json"));
 
     const copilotCommand = copilotHooks.hooks?.preToolUse?.[0]?.command || "";
     assert(copilotCommand.includes("node hooks/tool-guardian/guard-tool.mjs"), "Copilot hook must call Node guard tool");
@@ -133,6 +147,9 @@ async function validateHookCommands(): Promise<void> {
 
     const geminiCommand = geminiHooks.hooks?.BeforeTool?.[0]?.hooks?.[0]?.command || "";
     assert(geminiCommand.includes("${extensionPath}"), "Gemini hook must call guard tool via extensionPath variable");
+
+    const qwenCommand = qwenHooks.hooks?.BeforeTool?.[0]?.hooks?.[0]?.command || "";
+    assert(qwenCommand.includes("${extensionPath}"), "Qwen hook must call guard tool via extensionPath variable");
 }
 
 async function validateSkillFrontmatter(): Promise<void> {

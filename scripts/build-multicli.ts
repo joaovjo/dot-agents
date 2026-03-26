@@ -80,13 +80,33 @@ async function buildClaude(): Promise<void> {
     await writeJson(`${output}/.claude-plugin/plugin.json`, claudeManifest);
 }
 
+async function buildQwen(): Promise<void> {
+    const output = `${distDir}/nexus-orchestrator-qwen`;
+    await cleanDirectory(output);
+
+    await copyPath(".qwen-code", `${output}/.qwen-code`);
+    await copyPath("agents", `${output}/agents`);
+    await copyPath("skills", `${output}/skills`);
+    await copyPath("commands", `${output}/commands`);
+    await copyPath("hooks/tool-guardian", `${output}/hooks/tool-guardian`);
+    await copyPath("README.md", `${output}/README.md`);
+
+    const qwenHooks = await readJson<unknown>("hooks/hooks.qwen.json");
+    await writeJson(`${output}/hooks/hooks.json`, qwenHooks);
+
+    const qwenManifest = await readJson<Record<string, unknown>>(".qwen-code/manifest.json");
+    qwenManifest.hooks = "./hooks/hooks.json";
+    await writeJson(`${output}/.qwen-code/manifest.json`, qwenManifest);
+}
+
 async function run(): Promise<void> {
     await $`mkdir -p ${distDir}`;
     await buildCopilot();
     await buildGemini();
     await buildClaude();
+    await buildQwen();
 
-    process.stdout.write("Built dist artifacts for Copilot, Gemini, and Claude.\n");
+    process.stdout.write("Built dist artifacts for Copilot, Gemini, Claude, and Qwen.\n");
 }
 
 run().catch((error: unknown) => {

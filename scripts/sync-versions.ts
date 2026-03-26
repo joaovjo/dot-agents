@@ -21,8 +21,10 @@ const files = {
     copilotPlugin: `${pluginDir}/.plugin/plugin.json`,
     claudePlugin: `${pluginDir}/.claude-plugin/plugin.json`,
     geminiExtension: `${pluginDir}/gemini-extension.json`,
+    qwenManifest: `${pluginDir}/.qwen-code/manifest.json`,
     claudeMarketplace: `${rootDir}/.claude-plugin/marketplace.json`,
-    copilotMarketplace: `${rootDir}/.github/plugin/marketplace.json`
+    copilotMarketplace: `${rootDir}/.github/plugin/marketplace.json`,
+    qwenMarketplace: `${rootDir}/.qwen-code/marketplace.json`
 };
 
 const checkOnly = process.argv.includes("--check");
@@ -80,8 +82,10 @@ async function run(): Promise<void> {
 
     const claudeManifest = await readJson<PluginManifest & JsonObject>(files.claudePlugin);
     const geminiManifest = await readJson<PluginManifest & JsonObject>(files.geminiExtension);
+    const qwenManifest = await readJson<PluginManifest & JsonObject>(files.qwenManifest);
     const claudeMarketplace = await readJson<MarketplaceManifest & JsonObject>(files.claudeMarketplace);
     const copilotMarketplace = await readJson<MarketplaceManifest & JsonObject>(files.copilotMarketplace);
+    const qwenMarketplace = await readJson<MarketplaceManifest & JsonObject>(files.qwenMarketplace);
 
     const updates: string[] = [];
 
@@ -100,8 +104,14 @@ async function run(): Promise<void> {
         geminiManifest.version = targetVersion;
     }
 
+    if (qwenManifest.version !== targetVersion) {
+        updates.push(`qwen version ${qwenManifest.version} -> ${targetVersion}`);
+        qwenManifest.version = targetVersion;
+    }
+
     synchronizeMarketplace(claudeMarketplace, copilotManifest.name, targetVersion, updates, "claude marketplace");
     synchronizeMarketplace(copilotMarketplace, copilotManifest.name, targetVersion, updates, "copilot marketplace");
+    synchronizeMarketplace(qwenMarketplace, copilotManifest.name, targetVersion, updates, "qwen marketplace");
 
     if (checkOnly) {
         if (updates.length > 0) {
@@ -116,8 +126,10 @@ async function run(): Promise<void> {
     await writeJson(files.copilotPlugin, copilotManifest);
     await writeJson(files.claudePlugin, claudeManifest);
     await writeJson(files.geminiExtension, geminiManifest);
+    await writeJson(files.qwenManifest, qwenManifest);
     await writeJson(files.claudeMarketplace, claudeMarketplace);
     await writeJson(files.copilotMarketplace, copilotMarketplace);
+    await writeJson(files.qwenMarketplace, qwenMarketplace);
 
     process.stdout.write(`Synchronized versions to ${targetVersion}.\n`);
 }
