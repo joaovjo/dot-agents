@@ -7,7 +7,7 @@ const requiredFiles = [
     ".plugin/plugin.json",
     ".claude-plugin/plugin.json",
     ".qwen-code/manifest.json",
-    ".qwen-code/commands.json",
+    ".qwen-code/commands/nexus.md",
     "gemini-extension.json",
     "hooks.json",
     "hooks/hooks.gemini.json",
@@ -165,11 +165,21 @@ async function validateSkillFrontmatter(): Promise<void> {
     }
 }
 
+async function validateQwenCommand(): Promise<void> {
+    const commandPath = joinPath(pluginRoot, ".qwen-code", "commands", "nexus.md");
+    const content = await Bun.file(commandPath).text();
+    
+    assert(content.startsWith("---"), "Qwen command frontmatter missing");
+    assert(content.includes("description:"), "Qwen command description missing");
+    assert(content.includes("{{args}}"), "Qwen command must include {{args}} parameter");
+}
+
 async function run(): Promise<void> {
     await validateRequiredFiles();
     await validateManifestVersions();
     await validateHookCommands();
     await validateSkillFrontmatter();
+    await validateQwenCommand();
 
     process.stdout.write("Multi-CLI validation passed.\n");
 }
