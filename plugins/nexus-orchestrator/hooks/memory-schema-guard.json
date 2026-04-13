@@ -3,7 +3,12 @@
         "PostToolUse": [
             {
                 "type": "command",
-                "command": "bun .github/hooks/scripts/validate-memories-frontmatter.ts",
+                "command": "bun hooks/scripts/validate-memories-frontmatter.ts",
+                "timeout": 20
+            },
+            {
+                "type": "command",
+                "command": "bun hooks/scripts/validate-wiki-crossrefs.ts",
                 "timeout": 20
             }
         ]

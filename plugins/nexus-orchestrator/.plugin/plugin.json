@@ -20,7 +20,8 @@
 	],
 	"skills": [
 		"./skills/memory-bank",
-		"./skills/sequential-thinking"
+		"./skills/sequential-thinking",
+		"./skills/project-context"
 	],
 	"hooks": "./hooks.json"
 }

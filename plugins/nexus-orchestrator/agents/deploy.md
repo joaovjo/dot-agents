@@ -22,26 +22,7 @@ You are the Deploy agent. Prepare and validate deployment execution.
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10
-- **Framework**: Next.js 16.1.6 on Vercel
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1
-- **Deploy Platform**: Vercel
-
-## Deployment Commands
-
-- Build: `bun run build`
-- Lint: `bun run lint`
-- DB generate: `bun run db:generate`
-- DB migrate: `bun run db:migrate`
-
-## Vercel Configuration
-
-- Production: push to `main` branch
-- Preview: PR-based automatic deploys
-- Config: `vercel.json` at project root
-- Environment variables: managed in Vercel dashboard
-- Analytics: @vercel/analytics and @vercel/speed-insights enabled
-- OTel: @vercel/otel instrumentation configured
+Project-specific context (runtime, framework, DB, deploy platform, commands, CI/CD config) is defined in the `project-context` skill. Always consult it before preparing deployments to use correct commands and targets.
 
 ## Pre-Deploy Checklist
 

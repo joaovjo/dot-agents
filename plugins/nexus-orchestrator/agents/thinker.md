@@ -20,23 +20,7 @@ You are the Thinker. Produce high-signal decomposition for downstream planning a
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10 — use `bun --bun` prefix for all commands
-- **Framework**: Next.js 16.1.6 with App Router, React 19, PPR enabled
-- **Auth**: Better Auth v1.5.4 with Drizzle adapter, passkey, i18n plugins
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1 — schemas in `database/`
-- **UI**: shadcn v4 + Tailwind CSS v4 + Base UI + CVA + Phosphor Icons
-- **Linter**: Biome v2.4.9 (no ESLint/Prettier)
-- **Deploy**: Vercel with analytics, speed insights, and OTel
-
-## Setup Commands
-
-- Install deps: `bun install`
-- Dev server: `bun run dev`
-- Local smoke gate: `bun run dev` (start, readiness, HTTP request, teardown)
-- Build (release/ops/deploy only): `bun run build`
-- Lint: `bun run lint`
-- DB migrate: `bun run db:migrate`
-- DB seed: `bun run db:seed`
+Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, setup commands) is defined in the `project-context` skill. Always consult it before decomposing tasks to understand the current stack, available commands, and code conventions.
 
 ## Constraints
 

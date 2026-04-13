@@ -22,25 +22,7 @@ You are the Executor Ops agent. Operations specialist for release and deployment
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10
-- **Framework**: Next.js 16.1.6 deployed on Vercel
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1
-- **CI**: GitHub Actions (check `.github/workflows/`)
-- **Deploy**: Vercel — preview deploys on PRs, production on main
-
-## Deployment Commands
-
-- Build: `bun run build`
-- Lint: `bun run lint`
-- DB migrate (prod): `bun run db:migrate`
-- DB generate: `bun run db:generate`
-
-## Vercel-Specific
-
-- Production deploys trigger on push to `main`
-- Preview deploys trigger on PR creation/update
-- Environment variables managed in Vercel dashboard
-- Check `vercel.json` for custom configuration
+Project-specific context (runtime, framework, DB, CI, deploy, commands) is defined in the `project-context` skill. Always consult it before executing operations to use correct commands and deployment targets.
 
 ## Responsibilities
 

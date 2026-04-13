@@ -22,12 +22,7 @@ You are the Docs agent. Write technical documentation that is actionable and tra
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10
-- **Framework**: Next.js 16.1.6 (App Router, React 19, PPR)
-- **Auth**: Better Auth v1.5.4
-- **DB**: Drizzle ORM v0.45.1 with PostgreSQL
-- **UI**: shadcn v4 + Tailwind CSS v4
-- **Deploy**: Vercel
+Project-specific context (runtime, framework, auth, DB, UI, deploy) is defined in the `project-context` skill. Always consult it before writing documentation to reference correct commands, paths, and conventions.
 
 ## Documentation Locations
 

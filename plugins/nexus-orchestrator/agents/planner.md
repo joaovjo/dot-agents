@@ -23,22 +23,7 @@ You are the Planner. Convert requirements and thinker output into an implementat
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10 — always use `bun --bun` prefix
-- **Framework**: Next.js 16.1.6 (App Router, React 19, PPR, `use cache`)
-- **Auth**: Better Auth v1.5.4 with Drizzle adapter
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1 — schemas in `database/schemas/`
-- **UI**: shadcn v4 + Tailwind CSS v4 + CVA + Base UI
-- **Linter**: Biome v2.4.9 — run `bun run lint` before committing
-- **Deploy**: Vercel
-
-## Code Style
-
-- TypeScript strict mode
-- Biome for linting and formatting (NOT ESLint/Prettier)
-- Use `import type {}` for type-only imports
-- Use functional patterns and React Server Components by default
-- Client components only when hooks/interactivity is required (`'use client'`)
-- Use `clsx` + `tailwind-merge` via `cn()` utility for class merging
+Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, code style) is defined in the `project-context` skill. Always consult it before producing plans to use correct commands, file paths, and conventions.
 
 ## Constraints
 

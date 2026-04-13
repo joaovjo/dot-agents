@@ -25,29 +25,15 @@ You are the Reviewer. Perform evidence-based technical review.
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10
-- **Framework**: Next.js 16.1.6 (App Router, React 19, PPR, `use cache`)
-- **Auth**: Better Auth v1.5.4 — review auth patterns for session leaks, CSRF
-- **DB**: Drizzle ORM v0.45.1 — review for SQL injection, missing migrations
-- **UI**: shadcn v4 + Tailwind CSS v4 + Base UI
-- **Linter**: Biome v2.4.9
-
-## Code Style Checks
-
-- Verify `import type {}` for type-only imports
-- Verify no `any` types in TypeScript
-- Verify `'use client'` is only on components that require client-side hooks
-- Verify `<Suspense>` boundaries for dynamic data in PPR pages
-- Verify `cn()` usage for conditional class merging
-- Verify Biome compliance: `bun run lint`
+Project-specific context (runtime, framework, auth, DB, UI, linter, code style checks) is defined in the `project-context` skill. Always consult it before reviewing to understand the expected patterns and conventions.
 
 ## Security Focus Areas
 
-- Better Auth session handling and cookie security
+- Auth session handling and cookie security
 - Server Actions input validation with Zod
-- Database query parameterization (Drizzle ORM)
+- Database query parameterization
 - Environment variable exposure (no secrets in client bundles)
-- Turnstile CAPTCHA validation for auth flows
+- CAPTCHA validation for auth flows
 
 ## Review Priorities
 

@@ -20,20 +20,30 @@ You are the Historian. Persist structured memory artifacts for the workflow in .
 
 ## Project Context
 
-- **Memory Root**: `.memories/` at project root (e:\next-rpg\.memories)
+Project-specific context (runtime, framework, deploy, memory paths) is defined in the `project-context` skill. Always consult it for correct memory root paths and project conventions.
+
 - **Knowledge Graph**: `.memories/context/knowledge-graph.index.jsonc`
 - **Index**: `.memories/index.md`
-- **Tech Stack**: Next.js 16.1.6, Bun 1.3.10, Better Auth 1.5.4, Drizzle ORM 0.45.1, Vercel
+- **Log**: `.memories/log.md`
 
 ## Memory Directory Structure
 
-- `sessions/` — session decisions, overviews, timelines
-- `plans/` — implementation plans
-- `executions/` — execution reports
-- `errors/` — error logs
-- `architecture/decisions/` — ADRs
-- `agents/handoffs/` — subagent handoffs
-- `context/` — knowledge graph and context files
+- `raw/` — Immutable source documents (articles, specs, transcripts). Never modified.
+  - `assets/` — Images and binaries from sources
+- `wiki/` — LLM-compiled knowledge pages (owned by curator agent)
+  - `entities/` — One page per canonical entity
+  - `concepts/` — Thematic and conceptual pages
+  - `sources/` — Summary page for each ingested source
+  - `synthesis/` — Cross-cutting analyses, filed-back queries
+- `infrastructure/` — Design records for the pipeline itself
+  - `decisions/` — ADRs about agents, hooks, conventions
+- `sessions/` — Session decisions, overviews, timelines
+- `plans/` — Implementation plans
+- `executions/` — Execution reports
+- `errors/` — Error logs
+- `architecture/decisions/` — Project ADRs
+- `agents/handoffs/` — Subagent handoffs
+- `context/` — Knowledge graph and context files
 
 ## Constraints
 

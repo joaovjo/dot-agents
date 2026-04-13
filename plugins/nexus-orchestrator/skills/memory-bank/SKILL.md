@@ -59,13 +59,37 @@ utc_datetime_prefix: '<YYYY-MM-DDTHH-MM-SSZ>'
 - `constraints` (optional): policy, time, tool, or architecture constraints.
 
 ## Memory Model
-This skill uses two complementary layers:
+This skill uses four complementary layers:
 
-1. File Memory Bank (source of truth)
-- Directory root: `.memories/`.
+### 1. Raw Sources (immutable source of truth)
+- Directory: `.memories/raw/`
+- Curated source documents: articles, papers, specs, transcripts, images.
+- The LLM reads from them but NEVER modifies them.
+- Assets (images, binaries): `.memories/raw/assets/`
+- File naming: `<utc_datetime_prefix>__<descriptive-name>.<ext>`
+
+### 2. The Wiki (LLM-compiled knowledge)
+- Directory: `.memories/wiki/`
+- LLM-generated markdown pages: summaries, entity pages, concept pages, comparisons, synthesis.
+- The LLM (via curator agent) owns this layer entirely — creates, updates, cross-references.
+- Subdirectories:
+  - `entities/` — One page per canonical entity
+  - `concepts/` — Thematic and conceptual pages
+  - `sources/` — Summary page for each ingested source
+  - `synthesis/` — Cross-cutting analyses, filed-back queries
+
+### 3. Operational Memory (workflow records)
+- Directory: `.memories/` (root level subdirectories)
 - Primary records: sessions, plans, executions, errors, architecture decisions, and context.
 - Index: `.memories/index.md` must always reflect discoverable records.
+- Log: `.memories/log.md` for chronological operation timeline.
 - File naming format: `<utc_datetime_prefix>__<intention-revealing-name>.md`.
+
+### 4. Infrastructure Layer (pipeline design records)
+- Directory: `.memories/infrastructure/`
+- Design records for agents, hooks, rules, and conventions themselves.
+- ADRs about the pipeline (not the project): `.memories/infrastructure/decisions/`
+- Schema rationale and evolution history.
 
 2. Knowledge Graph Index (retrieval accelerator)
 - Entity: named object (`person`, `service`, `feature`, `incident`, etc.).
@@ -210,6 +234,106 @@ File naming examples for auditable records:
 - Mark stale or conflicting facts as superseded, never silently remove history.
 - Ensure unresolved issues in `errors/` are linked to active plans when applicable.
 - Emit a concise "memory health" summary for the Orchestrator.
+
+## Log File (`.memories/log.md`)
+
+Append-only chronological record of all operations. Each entry uses a parseable prefix:
+
+```markdown
+## [2026-04-13T22:40:05Z] ingest | Karpathy LLM Wiki Article
+- source: raw/2026-04-13T22-40-05Z__karpathy-llm-wiki.md
+- pages_touched: 12
+- entities_created: 3
+- agent: curator
+
+## [2026-04-13T23:10:00Z] query | "How does the ingest pattern work?"
+- result_page: wiki/synthesis/ingest-pattern-overview.md
+- filed_back: true
+- agent: curator
+
+## [2026-04-13T23:30:00Z] lint | Health Check Pass
+- orphan_pages: 2
+- stale_pages: 1
+- contradictions: 0
+- agent: curator
+
+## [2026-04-14T01:00:00Z] execution | Feature X implementation
+- plan: plans/2026-04-14T01-00-00Z__feature-x-plan.md
+- status: success
+- agent: executor
+```
+
+The log is parseable with `grep "^## \[" log.md | tail -5`.
+The historian and curator MUST append to this log after every operation.
+
+## Claim Type Annotations
+
+Every wiki page claim must be annotated with its provenance type using callouts:
+
+```markdown
+> [!SOURCE] **Verbatim or close paraphrase from a source**
+> Citation: path to raw source or wiki source page
+
+> [!ANALYSIS] **Inference derived from sourced facts**
+> Reasoning: explain how this was derived
+
+> [!UNVERIFIED] **Plausible claim without authoritative source**
+> Confidence: HIGH / MEDIUM / LOW
+
+> [!GAP] **Explicitly missing information — never fill with guesses**
+```
+
+The `[!ANALYSIS]` / `[!UNVERIFIED]` split prevents paraphrasing-bias: when the model rewrites what a source says, the provenance type makes it traceable whether the rewrite is faithful.
+
+## Staleness Scoring
+
+During `reconcile`, compute staleness for each wiki page:
+
+1. For each outgoing `[[wikilink]]` dependency, check its `updated_at`.
+2. `staleScore = max(updated_at of outgoing dependencies) - updated_at of this page`
+3. Forward-only — no backlink tracking needed for scoring.
+4. Thresholds:
+   - `staleScore < 3 days`: fresh ✅
+   - `staleScore 3-7 days`: aging ⚠️
+   - `staleScore > 7 days`: stale 🔴
+5. Update `stale_score` in wiki page frontmatter.
+6. Surface worst offenders in the reconcile health summary.
+
+## Improved Index Format (`.memories/index.md`)
+
+The index must be organized by category with one-line summaries:
+
+```markdown
+# Wiki Index
+
+## Entities
+- [[wiki/entities/orchestrator]] — Pure delegation router for the workflow (5 sources)
+- [[wiki/entities/curator]] — Wiki maintainer with ingest/query/lint ops (2 sources)
+
+## Concepts
+- [[wiki/concepts/ingest-pattern]] — How raw sources become compiled wiki (2 sources)
+- [[wiki/concepts/staleness-scoring]] — Mechanical freshness tracking (1 source)
+
+## Sources
+- [[wiki/sources/karpathy-llm-wiki]] — LLM Wiki pattern for personal knowledge bases (2026-04-13)
+
+## Synthesis
+- [[wiki/synthesis/wiki-vs-rag]] — Comparison of compiled wiki vs. RAG approaches
+
+## Sessions
+- [[sessions/2026-04-13T22-40-05Z__session-overview]] — Initial wiki setup session
+
+## Plans
+- [[plans/2026-04-13T22-40-05Z__feature-x-plan]] — Feature X implementation plan
+
+## Executions
+- [[executions/2026-04-13T22-40-05Z__feature-x-execution]] — Feature X execution report
+
+## Architecture Decisions
+- [[architecture/decisions/2026-04-13T22-40-05Z__adr-001]] — ADR title
+```
+
+The curator and historian share responsibility for keeping this index current.
 
 ## Decision Points and Branching
 - If task scope is narrow and known: run targeted `retrieve` (`open_nodes` equivalent).

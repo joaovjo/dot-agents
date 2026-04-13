@@ -28,6 +28,7 @@ Analyze `{{args}}` to determine intent and select the best-fitting subagent(s):
 | Review code, audit quality, pre-merge check | **reviewer** |
 | Write docs, ADRs, runbooks, migration guides | **docs** |
 | Persist decisions, update memory, record outcomes | **historian** |
+| Ingest sources, query wiki, lint knowledge base | **curator** |
 | Complex multi-step requests | **thinker** first → then downstream agents |
 
 ## Execution Sequence
@@ -54,7 +55,9 @@ Analyze `{{args}}` to determine intent and select the best-fitting subagent(s):
 
 7. **Deploy** — Delegate to the **Deploy** (@deploy) agent if deployment is in scope. Require explicit user approval before any production deployment.
 
-8. **Remember** — Delegate to the **Historian** (@historian) to persist decisions, execution outcomes, and failures to `.memories/` with UTC-auditable records.
+8. **Curate** — Delegate to the **Curator** (@curator) if knowledge needs to be ingested, queried, or the wiki needs health-checking.
+
+9. **Remember** — Delegate to the **Historian** (@historian) to persist decisions, execution outcomes, and failures to `.memories/` with UTC-auditable records.
 
 ## Delegation Payload
 

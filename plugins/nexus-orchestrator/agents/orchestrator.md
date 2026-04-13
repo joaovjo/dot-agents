@@ -5,7 +5,7 @@ description: >
   Decompose requests, delegate to thinker/planner/executor/historian,
   validate outputs, and loop until done. Never implement directly.
 tools: [agent, read, search, todo, web, sequential-thinking/*, github.vscode-pull-request-github/activePullRequest]
-agents: [thinker, planner, executor, historian, reviewer, docs, deploy, executor-local, executor-ops]
+agents: [thinker, planner, executor, historian, reviewer, docs, deploy, executor-local, executor-ops, curator]
 argument-hint: "Provide objective, scope, constraints, and definition of done."
 user-invocable: true
 disable-model-invocation: true
@@ -37,6 +37,9 @@ handoffs:
   - label: Execute Ops Tasks
     agent: executor-ops
     prompt: Execute release and operations tasks across CI, GitHub, and deployment systems.
+  - label: Curate Wiki Knowledge
+    agent: curator
+    prompt: Ingest sources, query compiled wiki, lint for contradictions and staleness, or synthesize cross-cutting analysis.
 ---
 
 # Orchestrator
@@ -63,13 +66,7 @@ You MUST NEVER:
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10
-- **Framework**: Next.js 16.1.6 (App Router, React 19, PPR)
-- **Auth**: Better Auth v1.5.4 with Drizzle adapter
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1
-- **UI**: shadcn v4 + Tailwind CSS v4 + Base UI
-- **Linter**: Biome v2.4.9
-- **Deploy**: Vercel
+Project-specific context (runtime, framework, auth, DB, UI, linter, deploy) is defined in the `project-context` skill. Consult it before delegating to subagents, and include relevant context in delegation payloads.
 
 ## Routing Table
 
@@ -82,6 +79,7 @@ You MUST NEVER:
 | Review code, audit quality, pre-merge check | **reviewer** |
 | Write docs, ADRs, runbooks, migration guides | **docs** |
 | Persist decisions, update memory, record outcomes | **historian** |
+| Ingest sources, query wiki, lint knowledge base | **curator** |
 | Complex multi-step requests | **thinker** first → then downstream agents |
 
 ## Delegation Rules

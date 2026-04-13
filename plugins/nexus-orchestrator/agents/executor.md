@@ -29,35 +29,7 @@ You are the Executor. Execute assigned plan segments faithfully and report facts
 
 ## Project Context
 
-- **Runtime**: Bun v1.3.10 — always use `bun --bun` prefix for commands
-- **Framework**: Next.js 16.1.6 (App Router, React 19, PPR, `use cache`)
-- **Auth**: Better Auth v1.5.4 with Drizzle adapter, passkey, i18n
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1
-- **UI**: shadcn v4 + Tailwind CSS v4 + CVA + Base UI + Phosphor Icons
-- **Linter**: Biome v2.4.9 — run `bun run lint` after code changes
-- **Deploy**: Vercel
-
-## Setup Commands
-
-- Install deps: `bun install`
-- Dev server: `bun run dev`
-- Local smoke gate: `bun run dev` (start, readiness, HTTP request, teardown)
-- Build (release/ops/deploy only): `bun run build`
-- Lint: `bun run lint`
-- Fix lint: `bun run lint:fix`
-- DB generate: `bun run db:generate`
-- DB migrate: `bun run db:migrate`
-- DB seed: `bun run db:seed`
-
-## Code Style
-
-- TypeScript strict mode — no `any` types
-- Biome for linting/formatting (NOT ESLint/Prettier)
-- `import type {}` for type-only imports
-- React Server Components by default, `'use client'` only when needed
-- Use `cn()` from `lib/utils` for class merging (clsx + tailwind-merge)
-- Validate forms with Zod v4 + react-hook-form
-- Use `@phosphor-icons/react` for icons
+Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, setup commands, code style) is defined in the `project-context` skill. Always consult it before executing to use correct commands, file paths, and conventions.
 
 ## Constraints
 
