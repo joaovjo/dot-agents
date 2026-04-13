@@ -1,13 +1,13 @@
 ---
 name: sequential-thinking
-description: 'Internal sequential reasoning protocol for nexus-orchestrator and nexus-thinker. Apply MCP-style numbered thoughts, revisions, branches, dynamic thought budgets, and verified solution hypotheses for complex decomposition, re-planning, and failure diagnosis.'
+description: 'Internal sequential reasoning protocol for orchestrator and thinker. Apply MCP-style numbered thoughts, revisions, branches, dynamic thought budgets, and verified solution hypotheses for complex decomposition, re-planning, and failure diagnosis.'
 user-invocable: false
 ---
 
-# Sequential Thinking for Nexus Orchestrator
+# Sequential Thinking for Orchestrator
 
 Use this skill to run a structured reasoning loop before planning, re-planning, or diagnosing failures.
-It mirrors the Sequential Thinking MCP concept and adapts it to the Nexus multi-agent workflow.
+It mirrors the Sequential Thinking MCP concept and adapts it to the multi-agent workflow.
 
 ## Invocation Policy
 - Not user-facing.
@@ -27,7 +27,7 @@ Each step can be revised when new evidence appears, branched when alternatives e
 
 ## Integration Patterns
 
-### With Nexus Workflow
+### With Workflow
 Think (this skill) -> Plan -> Execute -> Validate -> Remember
 
 ### With TDD Tasks
@@ -155,7 +155,7 @@ Use this structure for handoff:
 - <what the orchestrator should do now>
 ```
 
-If invoked inside `nexus-thinker`, align the final handoff to the exact format defined in `agents/thinker-subagent.md`.
+If invoked inside `thinker`, align the final handoff to the exact format defined in `agents/thinker-subagent.md`.
 
 ## Quality Gates
 Before ending the loop (`nextThoughtNeeded: false`), ensure:
@@ -190,8 +190,8 @@ Avoid:
 - Treating thought chains as a substitute for tests.
 - Mixing unrelated decisions in one thought.
 
-## Nexus Integration Notes
-- `nexus-orchestrator`: invoke this skill before first planning and after failures.
-- `nexus-thinker`: use this schema as the internal reasoning protocol.
-- `nexus-planner`: consume verified hypothesis and dependency map.
-- `nexus-historian`: persist thought chain snapshots for decision traceability.
+## Integration Notes
+- `orchestrator`: invoke this skill before first planning and after failures.
+- `thinker`: use this schema as the internal reasoning protocol.
+- `planner`: consume verified hypothesis and dependency map.
+- `historian`: persist thought chain snapshots for decision traceability.

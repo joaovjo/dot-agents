@@ -1,0 +1,11 @@
+{
+    "hooks": {
+        "PostToolUse": [
+            {
+                "type": "command",
+                "command": "bun .github/hooks/scripts/validate-memories-frontmatter.ts",
+                "timeout": 20
+            }
+        ]
+    }
+}

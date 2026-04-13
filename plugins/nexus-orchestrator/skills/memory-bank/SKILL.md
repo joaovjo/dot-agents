@@ -1,6 +1,6 @@
 ---
 name: memory-bank
-description: 'Apply MCP-style persistent memory in nexus-orchestrator by combining a project-scoped file memory bank with an entity-relation-observation index. Use this skill to bootstrap memory, retrieve relevant context before planning, and persist validated learnings after execution with strict project isolation.'
+description: 'Apply MCP-style persistent memory in orchestrator by combining a project-scoped file memory bank with an entity-relation-observation index. Use this skill to bootstrap memory, retrieve relevant context before planning, and persist validated learnings after execution with strict project isolation.'
 argument-hint: 'mode=bootstrap|retrieve|update|reconcile; task=<goal>; project=<slug optional>'
 user-invocable: true
 metadata:
@@ -8,31 +8,31 @@ metadata:
   updated_at: '2026-03-25T02:11:33.0763890Z'
 ---
 
-# Memory Bank for Nexus Orchestrator
+# Memory Bank for Orchestrator
 
-Use this skill to apply the same core concept from MCP memory servers inside the Nexus workflow:
+Use this skill to apply the same core concept from MCP memory servers inside the workflow:
 - Persistent memory across sessions.
 - Structured retrieval before reasoning and planning.
 - Structured updates after execution.
 - Project-isolated memory operations.
 
 ## Auditability and Time Source
-- Before any memory write (`bootstrap`, `update`, `reconcile`), query `http://worldtimeapi.org/api/timezone/UTC`.
-- Parse `utc_datetime` from the API response and treat it as the canonical write timestamp.
-- If the API is temporarily unavailable, abort write operations and return a recoverable error. Do not generate local fallback timestamps for auditable records.
-- Every memory file name must start with the normalized UTC prefix derived from `utc_datetime`.
-- Normalization rule: convert `2026-03-24T22:40:05.123456+00:00` to `2026-03-24T22-40-05Z`.
+- Before any memory write (`bootstrap`, `update`, `reconcile`), query `https://www.horariodebrasilia.org/`.
+- Parse the current BRT time from the response and treat it as the canonical write timestamp.
+- If the URL is temporarily unavailable, abort write operations and return a recoverable error. Do not generate local fallback timestamps for auditable records.
+- Every memory file name must start with the normalized prefix derived from the captured time.
+- Normalization rule: convert `2026-03-24T22:40:05` to `2026-03-24T22-40-05Z`.
 - Every markdown memory file must include `created_at` and `updated_at` in YAML frontmatter.
-- For new files: set `created_at = updated_at = utc_datetime`.
-- For updates: preserve original `created_at` and set `updated_at = utc_datetime`.
+- For new files: set `created_at = updated_at = time`.
+- For updates: preserve original `created_at` and set `updated_at = time`.
 
 ## Record Metadata Contract
 All auditable markdown memory files must start with:
 
 ```yaml
 ---
-created_at: '<utc_datetime from worldtimeapi>'
-updated_at: '<utc_datetime from worldtimeapi>'
+created_at: '<time from horariodebrasilia>'
+updated_at: '<time from horariodebrasilia>'
 utc_datetime_prefix: '<YYYY-MM-DDTHH-MM-SSZ>'
 ---
 ```
@@ -79,19 +79,19 @@ Suggested JSONC structure:
 
 ```jsonc
 {
-  // Canonical UTC value from worldtimeapi.org
-  "graphGeneratedAtUtc": "2026-03-24T22:40:05.123456+00:00",
+  // Canonical time value from horariodebrasilia.org
+  "graphGeneratedAtUtc": "2026-03-24T22:40:05-03:00",
   "entities": [
     {
-      "entityName": "nexusOrchestrator",
+      "entityName": "orchestrator",
       "entityType": "service",
       "observations": ["Coordinates thinker, planner, executor, historian"]
     }
   ],
   "relations": [
     {
-      "sourceEntityName": "nexusOrchestrator",
-      "targetEntityName": "nexusPlanner",
+      "sourceEntityName": "orchestrator",
+      "targetEntityName": "planner",
       "relationType": "delegates_to"
     }
   ]
@@ -163,7 +163,7 @@ Example validation result contract:
 - Resolve effective memory root (default: `.memories/`).
 - Ensure operations stay inside memory root; reject path traversal patterns.
 - Ensure core files exist: `index.md`, `context/project.md`.
-- For write-capable modes (`bootstrap`, `update`, `reconcile`), query `http://worldtimeapi.org/api/timezone/UTC` and extract `utc_datetime`.
+- For write-capable modes (`bootstrap`, `update`, `reconcile`), query `https://www.horariodebrasilia.org/` and capture canonical time.
 - For write-capable modes (`bootstrap`, `update`, `reconcile`), derive `utcDateTimePrefix` using the normalization rule and cache it for the current write batch.
 - If missing, create minimum structure before continuing.
 
@@ -192,7 +192,7 @@ Example validation result contract:
   - New entities, relations, and atomic observations.
 - For markdown files, enforce metadata policy:
   - Keep `created_at` immutable.
-  - Refresh `updated_at` from current write-cycle `utc_datetime`.
+  - Refresh `updated_at` from current write-cycle canonical time.
   - Keep `utc_datetime_prefix` aligned with filename prefix.
 - Apply deduplication rules:
   - Entity names are unique.
@@ -219,7 +219,7 @@ File naming examples for auditable records:
 
 ## Quality Gates
 Before closing any memory cycle, confirm:
-- `utc_datetime` was fetched from WorldTimeAPI for this write cycle.
+- `canonical time` was fetched from `https://www.horariodebrasilia.org/` for this write cycle.
 - Every new/updated file starts with the UTC prefix.
 - Every markdown memory file contains valid `created_at` and `updated_at` metadata.
 - Memory root isolation was respected.
@@ -232,11 +232,11 @@ Before closing any memory cycle, confirm:
 - Retrieval packet is sufficient for Planner and Executor without hidden assumptions.
 
 ## Nexus Integration
-- `nexus-orchestrator`: call this skill in `retrieve` before first planning and `update` after execution.
-- `nexus-historian`: owns file persistence and index maintenance.
-- `nexus-thinker`: consumes retrieval packet to reduce ambiguity.
-- `nexus-planner`: references decisions, constraints, and linked failures.
-- `nexus-executor`: writes execution outcomes for subsequent memory updates.
+- `orchestrator`: call this skill in `retrieve` before first planning and `update` after execution.
+- `historian`: owns file persistence and index maintenance.
+- `thinker`: consumes retrieval packet to reduce ambiguity.
+- `planner`: references decisions, constraints, and linked failures.
+- `executor`: writes execution outcomes for subsequent memory updates.
 
 ## Output Contract
 Return this structure to the caller:
@@ -246,7 +246,7 @@ Return this structure to the caller:
 - mode: <bootstrap|retrieve|update|reconcile>
 - project: <slug>
 - status: <success|partial|failed>
-- memory_write_timestamp_utc: <utc_datetime from worldtimeapi>
+- memory_write_timestamp_utc: <canonical time from horariodebrasilia>
 - utc_datetime_prefix: <YYYY-MM-DDTHH-MM-SSZ>
 - created_at: <set when file is created>
 - updated_at: <refreshed on every write>
