@@ -4,7 +4,7 @@ description: >
   Use when an approved plan segment must be executed exactly as specified.
   Perform file edits and commands, verify outcomes, and return a structured
   execution report. Not user-facing.
-tools: [agent, read, search, edit, execute, web, browser, github/*, vercel/*, gitkraken/*, chrome-devtools-mcp/*, vscode.mermaid-chat-features/renderMermaidDiagram, mermaidchart.vscode-mermaid-chart/get_syntax_docs, mermaidchart.vscode-mermaid-chart/mermaid-diagram-validator, mermaidchart.vscode-mermaid-chart/mermaid-diagram-preview, ms-azuretools.vscode-containers/containerToolsConfig]
+tools: [agent, read, search, edit, execute, web, browser, github/*, chrome-devtools-mcp/*]
 argument-hint: "Provide plan, allowed scope, dependencies, and success criteria."
 user-invocable: true
 disable-model-invocation: false
@@ -36,8 +36,8 @@ Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, setu
 - Never change scope without explicit instruction.
 - Never "improve" unrelated code.
 - On step failure, stop dependent steps and report immediately.
-- Always run `bun run lint` after modifying code files.
-- Use `bun run dev` smoke checks as the default local runtime validation; run `bun run build` only for release/ops/deploy tracks or when explicitly requested.
+- Always run the lint command defined in the `project-context` skill after modifying code files.
+- Use the dev server command from the `project-context` skill as the default local validation gate; run the build command only for release/ops/deploy tracks or when explicitly requested.
 
 ## Execution Protocol
 
@@ -50,7 +50,7 @@ For each step:
 ## Memory Write Compliance
 
 If writing under .memories:
-- Use canonical time from https://www.horariodebrasilia.org/
+- Use canonical UTC time from the source defined in the `project-context` skill, or system clock UTC as fallback
 - Apply UTC filename prefix: YYYY-MM-DDTHH-MM-SSZ__
 - Enforce created_at and updated_at frontmatter policies
 - If UTC source fails, mark as recoverable infra failure and do not write

@@ -4,7 +4,7 @@ description: >
   Use when a decomposition needs an execution-ready implementation plan.
   Produce atomic, testable steps with dependencies, acceptance criteria, and
   rollback guidance. Not user-facing.
-tools: [agent, read, search, edit, web, context7/*, deepwiki/*, docfork/*, better-auth/*, shadcn/*, bun-mcp/*]
+tools: [agent, read, search, edit, web, context7/*, deepwiki/*, bun-mcp/*]
 argument-hint: "Provide objective, scope, constraints, and technical context."
 user-invocable: true
 disable-model-invocation: false
@@ -38,10 +38,10 @@ Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, code
 - Use exact targets (file paths, commands, symbols).
 - Mark concurrent steps with [PARALLEL-GROUP: N] where safe.
 - Include preconditions and explicit acceptance criteria.
-- Reference `.next-docs/` for Next.js 16 API specifics.
-- Always specify `bun run` (not `npm run`) in planned commands.
+- Reference framework docs from the `project-context` skill when applicable.
+- Use the package manager and commands defined in the `project-context` skill.
 - For long-lived or shareable plans, persist in .memories/plans using UTC-prefixed file naming.
-- When writing under .memories, fetch canonical time from https://www.horariodebrasilia.org/ and enforce created_at/updated_at metadata.
+- When writing under .memories, use canonical UTC time (from the source defined in `project-context` skill or system clock UTC) and enforce created_at/updated_at metadata.
 
 ## Output Format
 

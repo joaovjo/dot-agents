@@ -17,9 +17,9 @@ Use this skill to apply the same core concept from MCP memory servers inside the
 - Project-isolated memory operations.
 
 ## Auditability and Time Source
-- Before any memory write (`bootstrap`, `update`, `reconcile`), query `https://www.horariodebrasilia.org/`.
-- Parse the current BRT time from the response and treat it as the canonical write timestamp.
-- If the URL is temporarily unavailable, abort write operations and return a recoverable error. Do not generate local fallback timestamps for auditable records.
+- Before any memory write (`bootstrap`, `update`, `reconcile`), fetch canonical UTC time from the source defined in the `project-context` skill (defaults to system clock UTC).
+- Treat the fetched time as the canonical write timestamp.
+- If the configured time source is unavailable, abort write operations and return a recoverable error. Do not generate local fallback timestamps for auditable records.
 - Every memory file name must start with the normalized prefix derived from the captured time.
 - Normalization rule: convert `2026-03-24T22:40:05` to `2026-03-24T22-40-05Z`.
 - Every markdown memory file must include `created_at` and `updated_at` in YAML frontmatter.
@@ -31,8 +31,8 @@ All auditable markdown memory files must start with:
 
 ```yaml
 ---
-created_at: '<time from horariodebrasilia>'
-updated_at: '<time from horariodebrasilia>'
+created_at: '<canonical UTC time>'
+updated_at: '<canonical UTC time>'
 utc_datetime_prefix: '<YYYY-MM-DDTHH-MM-SSZ>'
 ---
 ```
@@ -101,8 +101,8 @@ Suggested JSONC structure:
 
 ```jsonc
 {
-  // Canonical time value from horariodebrasilia.org
-  "registryGeneratedAtUtc": "2026-03-24T22:40:05-03:00",
+  // Canonical UTC time from project-context skill
+  "registryGeneratedAtUtc": "2026-03-24T22:40:05Z",
   "entries": [
     {
       "canonicalName": "orchestrator",
@@ -136,8 +136,8 @@ Suggested JSONC structure:
 
 ```jsonc
 {
-  // Canonical time value from horariodebrasilia.org
-  "graphGeneratedAtUtc": "2026-03-24T22:40:05-03:00",
+  // Canonical UTC time from project-context skill
+  "graphGeneratedAtUtc": "2026-03-24T22:40:05Z",
   "entities": [
     {
       "entityName": "orchestrator",
@@ -220,7 +220,7 @@ Example validation result contract:
 - Resolve effective memory root (default: `.memories/`).
 - Ensure operations stay inside memory root; reject path traversal patterns.
 - Ensure core files exist: `index.md`, `context/project.md`.
-- For write-capable modes (`bootstrap`, `update`, `reconcile`), query `https://www.horariodebrasilia.org/` and capture canonical time.
+- For write-capable modes (`bootstrap`, `update`, `reconcile`), fetch canonical UTC time from the source defined in the `project-context` skill.
 - For write-capable modes (`bootstrap`, `update`, `reconcile`), derive `utcDateTimePrefix` using the normalization rule and cache it for the current write batch.
 - If missing, create minimum structure before continuing.
 
@@ -376,7 +376,7 @@ The curator and historian share responsibility for keeping this index current.
 
 ## Quality Gates
 Before closing any memory cycle, confirm:
-- `canonical time` was fetched from `https://www.horariodebrasilia.org/` for this write cycle.
+- `canonical time` was fetched from the source defined in the `project-context` skill for this write cycle.
 - Every new/updated file starts with the UTC prefix.
 - Every markdown memory file contains valid `created_at` and `updated_at` metadata.
 - Memory root isolation was respected.
@@ -403,7 +403,7 @@ Return this structure to the caller:
 - mode: <bootstrap|retrieve|update|reconcile>
 - project: <slug>
 - status: <success|partial|failed>
-- memory_write_timestamp_utc: <canonical time from horariodebrasilia>
+- memory_write_timestamp_utc: <canonical UTC time from project-context skill>
 - utc_datetime_prefix: <YYYY-MM-DDTHH-MM-SSZ>
 - created_at: <set when file is created>
 - updated_at: <refreshed on every write>

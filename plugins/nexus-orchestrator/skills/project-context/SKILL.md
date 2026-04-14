@@ -1,10 +1,10 @@
 ---
 name: project-context
-description: 'Configurable project context injected into all agents. The LLM maintains this skill automatically by reading the project structure, package.json, and config files. All agents reference this instead of hardcoding project-specific details.'
+description: 'Configurable project context injected into all agents. The LLM maintains this skill automatically by reading the project structure, manifests, and config files. All agents reference this instead of hardcoding project-specific details.'
 user-invocable: true
 metadata:
   created_at: '2026-04-13T23:00:00Z'
-  updated_at: '2026-04-13T23:44:00Z'
+  updated_at: '2026-04-14T00:38:00Z'
 ---
 
 # Project Context
@@ -18,7 +18,7 @@ When installing Nexus Orchestrator on a new project, the LLM will automatically 
 
 ### For Existing Projects
 The LLM should periodically verify and update this file when:
-- Dependencies change (package.json updates)
+- Dependencies change (manifest updates)
 - Framework versions change
 - New build/test/deploy commands are added
 - Code conventions evolve
@@ -30,83 +30,93 @@ All agents should consult this file before any task. If an agent detects that a 
 
 ## Runtime & Framework
 
-<!-- [LLM: Update these values based on the project's package.json and tsconfig.json] -->
-- **Runtime**: Bun v1.3.10 — use `bun --bun` prefix for all commands
-- **Framework**: Next.js 16.1.6 with App Router, React 19, PPR enabled
-- **Language**: TypeScript (strict mode)
+<!-- [LLM: Auto-detect from package.json, Cargo.toml, requirements.txt, go.mod, pom.xml, or equivalent manifest] -->
+- **Runtime**: <!-- e.g. Node.js 22, Bun 1.x, Python 3.12, Go 1.22, Rust 1.78 -->
+- **Framework**: <!-- e.g. Next.js 16 with App Router, Django 5.x, FastAPI 0.110, Rails 7.x -->
+- **Language**: <!-- e.g. TypeScript (strict mode), Python, Go, Rust -->
 
 ## Authentication
 
-<!-- [LLM: Update based on auth libraries in package.json] -->
-- **Auth**: Better Auth v1.5.4 with Drizzle adapter, passkey, i18n plugins
+<!-- [LLM: Auto-detect from auth libraries in manifest or auth config files] -->
+- **Auth**: <!-- e.g. Better Auth, NextAuth, Passport.js, Django Auth, Clerk, etc. -->
 
 ## Database
 
-<!-- [LLM: Update based on ORM/driver in package.json and schema location] -->
-- **DB**: PostgreSQL via Drizzle ORM v0.45.1
-- **Schema Location**: `database/schemas/`
+<!-- [LLM: Auto-detect from ORM/driver in manifest and schema files] -->
+- **DB**: <!-- e.g. PostgreSQL via Drizzle ORM, Prisma, SQLAlchemy, etc. -->
+- **Schema Location**: <!-- e.g. database/schemas/, prisma/schema.prisma, etc. -->
 
 ## UI Stack
 
-<!-- [LLM: Update based on UI dependencies in package.json] -->
-- **Components**: shadcn v4 + Base UI
-- **Styling**: Tailwind CSS v4
-- **Class Merging**: `cn()` from `lib/utils` (clsx + tailwind-merge)
-- **Variants**: CVA (Class Variance Authority)
-- **Icons**: `@phosphor-icons/react`
-- **Forms**: Zod v4 + react-hook-form
+<!-- [LLM: Auto-detect from UI dependencies in manifest] -->
+- **Components**: <!-- e.g. shadcn, Radix, Material UI, Chakra, etc. -->
+- **Styling**: <!-- e.g. Tailwind CSS v4, CSS Modules, styled-components, etc. -->
+- **Icons**: <!-- e.g. Lucide, Phosphor, Heroicons, etc. -->
+- **Forms**: <!-- e.g. Zod + react-hook-form, Formik, etc. -->
 
 ## Linting & Formatting
 
-<!-- [LLM: Update based on linter config files and package.json scripts] -->
-- **Linter**: Biome v2.4.9 (NOT ESLint/Prettier)
-- **Lint Command**: `bun run lint`
-- **Fix Command**: `bun run lint:fix`
+<!-- [LLM: Auto-detect from linter config files (.eslintrc, biome.json, .prettierrc, etc.) and manifest scripts] -->
+- **Linter**: <!-- e.g. ESLint, Biome, Ruff, Clippy, etc. -->
+- **Lint Command**: <!-- e.g. npm run lint, bun run lint, cargo clippy -->
+- **Fix Command**: <!-- e.g. npm run lint:fix, bun run lint:fix, ruff format . -->
 
 ## Deployment
 
-<!-- [LLM: Update based on deployment config files and CI/CD setup] -->
-- **Platform**: Vercel
-- **Production**: push to `main` branch
-- **Preview**: PR-based automatic deploys
-- **Config**: `vercel.json` at project root
-- **Observability**: @vercel/analytics, @vercel/speed-insights, @vercel/otel
+<!-- [LLM: Auto-detect from deployment config files (vercel.json, Dockerfile, fly.toml, etc.)] -->
+- **Platform**: <!-- e.g. Vercel, AWS, GCP, Fly.io, Docker, etc. -->
+- **Production**: <!-- e.g. push to main, CI/CD pipeline trigger -->
+- **Preview**: <!-- e.g. PR-based automatic deploys -->
 
 ## Setup Commands
 
-<!-- [LLM: Update based on package.json scripts section] -->
+<!-- [LLM: Auto-detect from manifest scripts section (package.json scripts, Makefile, etc.)] -->
 | Purpose | Command |
 |---|---|
-| Install deps | `bun install` |
-| Dev server | `bun run dev` |
-| Local smoke gate | `bun run dev` (start, readiness, HTTP request, teardown) |
-| Build (release only) | `bun run build` |
-| Lint | `bun run lint` |
-| Fix lint | `bun run lint:fix` |
-| DB generate | `bun run db:generate` |
-| DB migrate | `bun run db:migrate` |
-| DB seed | `bun run db:seed` |
+| Install deps | <!-- e.g. npm install, bun install, pip install -r requirements.txt --> |
+| Dev server | <!-- e.g. npm run dev, bun run dev, python manage.py runserver --> |
+| Build (release only) | <!-- e.g. npm run build, bun run build, cargo build --release --> |
+| Lint | <!-- e.g. npm run lint, bun run lint, ruff check . --> |
+| Test | <!-- e.g. npm test, bun test, pytest --> |
 
 ## Code Style Rules
 
-<!-- [LLM: Update based on linter config and project conventions] -->
-- TypeScript strict mode — no `any` types
-- Biome for linting/formatting (NOT ESLint/Prettier)
-- `import type {}` for type-only imports
-- Functional patterns preferred
-- React Server Components by default; `'use client'` only when hooks/interactivity required
-- Use `cn()` from `lib/utils` for class merging
-- Validate forms with Zod v4 + react-hook-form
-- Use `@phosphor-icons/react` for icons
-- Wrap dynamic data in `<Suspense>` for PPR compatibility
+<!-- [LLM: Auto-detect from linter config, editorconfig, and project conventions] -->
+- <!-- e.g. TypeScript strict mode — no any types -->
+- <!-- e.g. import type {} for type-only imports -->
+- <!-- e.g. Functional patterns preferred -->
 
 ## Framework-Specific Notes
 
-<!-- [LLM: Update based on framework docs location and version-specific patterns] -->
-- **Framework Docs Location**: `.next-docs/` for Next.js 16 API specifics
-- Use smoke checks as default local gate
-- Reserve production builds for release/ops/deploy tracks
-- Always consider App Router patterns (RSC, Server Actions, `use cache`)
+<!-- [LLM: Auto-detect from framework docs location and version-specific patterns] -->
+- **Framework Docs Location**: <!-- e.g. .next-docs/, docs/, etc. -->
+- <!-- e.g. Use smoke checks as default local gate -->
+- <!-- e.g. Reserve production builds for release/ops/deploy tracks -->
+
+## Time Source
+
+<!-- Configurable canonical UTC source for auditable timestamps -->
+- **Canonical Time Source**: System clock UTC
+- **Fallback**: If configured source fails, abort auditable writes and return recoverable error
+- **Override**: Set a custom URL or API endpoint for canonical time if needed
+
+## Project-Specific MCP Servers
+
+<!-- [LLM: Add project-specific MCP servers below as they are configured] -->
+<!-- Example:
+- `better-auth/*` — Auth operations
+- `shadcn/*` — Component scaffolding
+- `vercel/*` — Deployment management
+-->
+
+## Project-Specific Tools
+
+<!-- [LLM: Add project-specific tools for agent use below] -->
+<!-- These tools should be added to agent frontmatter `tools:` lists when working on this project -->
+<!-- Example:
+- `docfork/*` — Documentation forking
+- `gitkraken/*` — Git visual management
+-->
 
 ## Memory Root
 

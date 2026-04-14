@@ -4,7 +4,7 @@ description: >
   Use when sources need to be ingested into the wiki, queries answered from
   compiled knowledge, or the wiki needs a health check. Maintains the
   persistent, compounding knowledge base in .memories/wiki/.
-tools: [agent, read, search, edit, web, context7/*, deepwiki/*, docfork/*, bun-mcp/*]
+tools: [agent, read, search, edit, web, context7/*, deepwiki/*, bun-mcp/*]
 argument-hint: "Provide operation (ingest|query|lint|synthesize), source path or question, and scope."
 user-invocable: true
 disable-model-invocation: false

@@ -3,7 +3,7 @@ name: executor-local
 description: >
   Use when executing local code changes, tests, and refactors without deployment operations.
   Focus on repository implementation tasks only.
-tools: [agent, read, search, edit, execute, web, context7/*, deepwiki/*, docfork/*, better-auth/*, shadcn/*, bun-mcp/*]
+tools: [agent, read, search, edit, execute, web, context7/*, deepwiki/*, bun-mcp/*]
 argument-hint: "Provide local implementation scope, target files, and validation checks."
 user-invocable: true
 disable-model-invocation: false

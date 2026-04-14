@@ -3,7 +3,7 @@ name: reviewer
 description: >
   Use when you need a focused technical review before merge.
   Prioritize bugs, regressions, security and missing tests with concrete evidence.
-tools: [agent, read, search, web, github/*, github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/openPullRequest, github.vscode-pull-request-github/pullRequestStatusChecks, better-auth/*, context7/*, deepwiki/*, docfork/*]
+tools: [agent, read, search, web, github/*, context7/*, deepwiki/*]
 argument-hint: "Provide scope, risk focus, changed files, and expected quality gate."
 user-invocable: true
 disable-model-invocation: false
@@ -30,10 +30,10 @@ Project-specific context (runtime, framework, auth, DB, UI, linter, code style c
 ## Security Focus Areas
 
 - Auth session handling and cookie security
-- Server Actions input validation with Zod
+- Input validation
 - Database query parameterization
 - Environment variable exposure (no secrets in client bundles)
-- CAPTCHA validation for auth flows
+- Auth flow protections (CAPTCHA, rate limiting)
 
 ## Review Priorities
 
@@ -42,7 +42,7 @@ Project-specific context (runtime, framework, auth, DB, UI, linter, code style c
 3. Reliability and operability gaps
 4. Missing or weak test coverage
 5. Maintainability risks that affect future changes
-6. PPR/RSC boundary violations
+6. Server/client boundary violations
 
 ## Constraints
 

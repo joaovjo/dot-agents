@@ -4,7 +4,7 @@ description: >
   Use when orchestration events must be persisted into auditable project
   memory files under .memories with UTC-prefixed filenames and JSONC graph
   updates. Not user-facing.
-tools: [agent, read, search, edit, web, github/*, github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/labels_fetch, github.vscode-pull-request-github/notification_fetch, github.vscode-pull-request-github/doSearch, github.vscode-pull-request-github/activePullRequest, github.vscode-pull-request-github/pullRequestStatusChecks, github.vscode-pull-request-github/openPullRequest]
+tools: [agent, read, search, edit, web, github/*]
 argument-hint: "Provide event type, scope, artifacts, and memory policy."
 user-invocable: true
 disable-model-invocation: false
@@ -53,7 +53,7 @@ Project-specific context (runtime, framework, deploy, memory paths) is defined i
 
 ## Auditability Requirements
 
-- Fetch canonical time from https://www.horariodebrasilia.org/ before write
+- Fetch canonical UTC time from the source defined in the `project-context` skill, or use system clock UTC as fallback
 - Prefix filenames with YYYY-MM-DDTHH-MM-SSZ__
 - Include created_at and updated_at in markdown frontmatter
 - Preserve created_at on updates; refresh updated_at

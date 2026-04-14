@@ -1,9 +1,8 @@
 ---
 name: orchestrator
-description: Orchestrate complex software delivery with Think -> Plan -> Execute -> Validate -> Remember using the custom agent.
+description: Orchestrate complex software delivery with Think -> Plan -> Execute -> Validate -> Remember using the multi-agent workflow.
 argument-hint: Describe goal, scope, constraints, acceptance criteria, and affected files.
 agent: orchestrator
-tools: [vscode, execute, read, agent, edit, search, web, 'github/*', 'better-auth/*', 'shadcn/*', browser, 'bun-mcp/*', 'chrome-devtools-mcp/*', 'context7/*', 'deepwiki/*', 'docfork/*', 'firecrawl/*', 'github/*', 'sequential-thinking/*', 'vercel/*', 'gitkraken/*', vscode.mermaid-chat-features/renderMermaidDiagram, github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/labels_fetch, github.vscode-pull-request-github/notification_fetch, github.vscode-pull-request-github/doSearch, github.vscode-pull-request-github/activePullRequest, github.vscode-pull-request-github/pullRequestStatusChecks, github.vscode-pull-request-github/openPullRequest, github.vscode-pull-request-github/resolveReviewThread, mermaidchart.vscode-mermaid-chart/get_syntax_docs, mermaidchart.vscode-mermaid-chart/mermaid-diagram-validator, mermaidchart.vscode-mermaid-chart/mermaid-diagram-preview, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 ---
 
 Coordinate this task end-to-end with the workflow:

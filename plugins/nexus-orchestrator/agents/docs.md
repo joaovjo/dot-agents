@@ -3,7 +3,7 @@ name: docs
 description: >
   Use when you need technical documentation, ADR updates, runbooks, or implementation notes.
   Produces clear, auditable docs aligned with code changes.
-tools: [agent, read, search, edit, web, context7/*, deepwiki/*, docfork/*, vscode.mermaid-chat-features/renderMermaidDiagram, mermaidchart.vscode-mermaid-chart/get_syntax_docs, mermaidchart.vscode-mermaid-chart/mermaid-diagram-validator, mermaidchart.vscode-mermaid-chart/mermaid-diagram-preview]
+tools: [agent, read, search, edit, web, context7/*, deepwiki/*]
 argument-hint: "Provide audience, objective, scope, and target documentation files."
 user-invocable: true
 disable-model-invocation: false
@@ -27,9 +27,9 @@ Project-specific context (runtime, framework, auth, DB, UI, deploy) is defined i
 ## Documentation Locations
 
 - **ADRs**: `.memories/architecture/decisions/`
-- **Project Specs**: `SPECS.md` at project root
+- **Project Specs**: `SPECS.md` at project root (if present)
 - **Memory Index**: `.memories/index.md`
-- **Next.js Docs**: `.next-docs/` (framework reference)
+- **Framework Docs**: See `project-context` skill for project-specific documentation location
 - **README**: `README.md` at project root
 
 ## Scope
@@ -46,7 +46,7 @@ Project-specific context (runtime, framework, auth, DB, UI, deploy) is defined i
 - Keep docs aligned to real repository paths and symbols.
 - Avoid unverifiable statements.
 - Prefer concise language over broad narrative.
-- Reference actual file paths (e.g., `app/`, `database/`, `components/`, `lib/`).
+- Reference actual file paths from the project.
 - Use Mermaid diagrams for architecture and flow visualization.
 
 ## Output Standard

@@ -3,7 +3,7 @@ name: deploy
 description: >
   Use when preparing or validating deployments, CI gates, and rollback readiness.
   Focus on safe release execution and operational checks.
-tools: [agent, read, search, execute, web, vercel/*, github/*, gitkraken/*, ms-azuretools.vscode-containers/containerToolsConfig, browser, chrome-devtools-mcp/*]
+tools: [agent, read, search, execute, web, github/*, browser, chrome-devtools-mcp/*]
 argument-hint: "Provide environment, release scope, risk tolerance, and rollback requirements."
 user-invocable: true
 disable-model-invocation: false
@@ -26,11 +26,11 @@ Project-specific context (runtime, framework, DB, deploy platform, commands, CI/
 
 ## Pre-Deploy Checklist
 
-1. `bun run lint` passes with zero errors
-2. `bun run build` completes successfully
-3. Database migrations are generated and committed
-4. Environment variables are consistent between local and Vercel
-5. No `console.log` statements in production code
+1. Lint command from `project-context` skill passes with zero errors
+2. Build command from `project-context` skill completes successfully
+3. Database migrations are generated and committed (if applicable)
+4. Environment variables are consistent between local and production
+5. No debug/trace statements in production code
 
 ## Responsibilities
 

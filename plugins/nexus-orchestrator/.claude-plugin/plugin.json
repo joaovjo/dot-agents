@@ -1,7 +1,7 @@
 {
     "name": "nexus-orchestrator",
-    "description": "Agentic workflow for orchestrated software delivery with persistent LLM Wiki knowledge base, entity registry, and structural invariant enforcement.",
-    "version": "1.1.0",
+    "description": "Multi-agent orchestration workflow with persistent LLM Wiki knowledge base, entity registry, and structural invariant enforcement.",
+    "version": "1.2.0",
     "author": {
         "name": "Joao Vitor de Jesus Oliveira"
     },
@@ -12,11 +12,11 @@
         "agentic-workflow",
         "orchestration",
         "subagents",
-        "planning",
-        "execution",
+        "wiki",
+        "knowledge-base",
         "memory"
     ],
     "agents": "./agents",
     "skills": "./skills",
-    "hooks": "./hooks/hooks.claude.json"
+    "hooks": "./hooks.json"
 }

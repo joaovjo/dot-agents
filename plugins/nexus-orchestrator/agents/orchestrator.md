@@ -2,9 +2,9 @@
 name: orchestrator
 description: >
   Use when you need end-to-end task orchestration with the workflow.
-  Decompose requests, delegate to thinker/planner/executor/historian,
+  Decompose requests, delegate to subagents,
   validate outputs, and loop until done. Never implement directly.
-tools: [agent, read, search, todo, web, sequential-thinking/*, github.vscode-pull-request-github/activePullRequest]
+tools: [agent, read, search, todo, web]
 agents: [thinker, planner, executor, historian, reviewer, docs, deploy, executor-local, executor-ops, curator]
 argument-hint: "Provide objective, scope, constraints, and definition of done."
 user-invocable: true
@@ -103,8 +103,7 @@ Include these fields in every subagent call:
 - DEPENDENCIES
 
 If memory writes are involved, include MEMORY_POLICY with:
-- requiresWorldTimeUtc: false
-- canonicalTimeSource: https://www.horariodebrasilia.org/
+- canonicalTimeSource: <from project-context skill or system clock UTC>
 - requireUtcPrefixInFileNames: true
 - requireCreatedAtUpdatedAt: true
 - knowledgeGraphIndexFormat: jsonc
