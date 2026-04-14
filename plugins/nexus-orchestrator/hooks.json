@@ -3,6 +3,7 @@
     "hooks": {
         "preToolUse": [
             {
+                "matcher": "write_file|edit_file|create_file|multi_replace_file_content|replace_file_content",
                 "type": "command",
                 "command": "bun hooks/scripts/raw-immutability-guard.ts",
                 "timeoutSec": 10
@@ -10,26 +11,31 @@
         ],
         "postToolUse": [
             {
+                "matcher": "write_file|edit_file|create_file|multi_replace_file_content|replace_file_content",
                 "type": "command",
                 "command": "bun hooks/scripts/validate-memories-frontmatter.ts",
                 "timeoutSec": 20
             },
             {
+                "matcher": "write_file|edit_file|create_file|multi_replace_file_content|replace_file_content",
                 "type": "command",
                 "command": "bun hooks/scripts/validate-wiki-crossrefs.ts",
                 "timeoutSec": 30
             },
             {
+                "matcher": "write_file|edit_file|create_file|multi_replace_file_content|replace_file_content",
                 "type": "command",
                 "command": "bun hooks/scripts/entity-registry-guard.ts",
                 "timeoutSec": 15
             },
             {
+                "matcher": "write_file|edit_file|create_file|multi_replace_file_content|replace_file_content",
                 "type": "command",
                 "command": "bun hooks/scripts/raw-immutability-guard.ts",
                 "timeoutSec": 10
             },
             {
+                "matcher": "write_file|edit_file|create_file|multi_replace_file_content|replace_file_content",
                 "type": "command",
                 "command": "bun hooks/scripts/validate-log-format.ts",
                 "timeoutSec": 10

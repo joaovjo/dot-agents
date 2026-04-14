@@ -5,13 +5,13 @@
     },
     "metadata": {
         "description": "Marketplace de plugins para fluxos orquestrados com subagentes.",
-        "version": "1.0.0"
+        "version": "1.3.0"
     },
     "plugins": [
         {
             "name": "nexus-orchestrator",
             "description": "Five-agent workflow for orchestrated software delivery with orchestrator, thinker, planner, executor, and historian subagents.",
-            "version": "1.0.0",
+            "version": "1.3.0",
             "source": "./plugins/nexus-orchestrator"
         }
     ]

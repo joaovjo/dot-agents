@@ -18,10 +18,14 @@ See `agents/` for individual agent definitions. This file provides a quick refer
 | **historian** | Persists structured records to `.memories/` with UTC-auditable filenames | @historian |
 | **curator** | Wiki maintenance — ingest, query, lint, synthesize knowledge | @curator |
 
+## Entry Point
+
+The **orchestrator** is the single user-facing entry point. All tasks are initiated via `/orchestrator` and routed to the appropriate subagent(s). No other commands are needed — the orchestrator detects intent and delegates automatically.
+
 ## Workflow
 
 ```
-User Request
+User Request → /orchestrator
     │
     ▼
 [1] THINK   → Decompose task into subtasks
@@ -36,7 +40,10 @@ User Request
 [4] VALIDATE → Review outcomes, re-delegate if needed
     │
     ▼
-[5] REMEMBER → Persist to memory bank
+[5] CURATE  → File reusable knowledge into wiki
+    │
+    ▼
+[6] REMEMBER → Persist to memory bank
     │
     ▼
 Response to user
@@ -53,20 +60,36 @@ Response to user
 - **Log**: Append parseable entry to `.memories/log.md` after every write
 - **Wiki immutability**: `.memories/raw/` is immutable — never modify source files
 - **Provenance**: Annotate claims with type (Source, Analysis, Unverified, Gap)
+- **Schema contracts**: `memory-bank` skill is the single source of truth for data structures
 
 ## Cross-CLI Capability Map
 
-Some ecosystems expose equivalent capabilities with different names. Prefer this map to avoid duplicated implementation logic:
+Some ecosystems expose equivalent capabilities with different names. This map prevents duplicated implementation logic — implement once in the canonical location, create adapters for other platforms.
 
-| Capability | Claude | Copilot VS Code | Gemini CLI | Qwen Code |
+| Capability | Claude Code | VS Code Copilot | Gemini CLI | Qwen Code |
 |---|---|---|---|---|
-| Agent definitions | `agents/` | `agents/` | `agents/` (subagents) | `agents/` |
-| Specialized workflows | `skills/` | `skills/` | `skills/` | `skills/` |
-| Lifecycle automation | `hooks/hooks.json` | `hooks.json` (or Claude-format auto-detected) | `hooks/hooks.json` | Hook-like automation through extension/runtime configuration |
-| Context bootstrap file | `CLAUDE.md` | Agent/plugin instructions | `GEMINI.md` or `contextFileName` | `QWEN.md` or `contextFileName` |
-| External tools | `.mcp.json` | `.mcp.json` | `mcpServers` in `gemini-extension.json` | `mcpServers` in extension manifest |
+| **Agent definitions** | `agents/*.md` | `agents/*.md` | `agents/*.md` (subagents) | `agents/*.md` |
+| **Skills / workflows** | `skills/*/SKILL.md` | `skills/*/SKILL.md` | `skills/*/SKILL.md` | `skills/*/SKILL.md` |
+| **Slash commands** | `commands/*.md` | `commands/*.md` | `commands/*.md` | `commands/*.md` |
+| **Lifecycle hooks** | `hooks/hooks.json` | `hooks.json` | `hooks/hooks.json` | hooks via extension config |
+| **Context bootstrap** | `CLAUDE.md` | Plugin instructions | `GEMINI.md` / `contextFileName` | `QWEN.md` / `contextFileName` |
+| **MCP servers** | `.mcp.json` | `.mcp.json` / `.vscode/mcp.json` | `mcpServers` in extension JSON | `mcpServers` in manifest |
+| **LSP servers** | `.lsp.json` | Built-in (VS Code) | — | — |
+| **Default settings** | `settings.json` | — | `settings` in extension JSON | — |
+| **Plugin manifest** | `.claude-plugin/plugin.json` | `.plugin/plugin.json` | `gemini-extension.json` | `.qwen-code/manifest.json` |
+| **Marketplace catalog** | `.claude-plugin/marketplace.json` | `.plugin/marketplace.json` | Gemini extensions registry | `.qwen-code/marketplace.json` |
+| **Event channels** | `channels/` (MCP-based push) | — | — | Channels (plugins) |
+| **Scheduled tasks** | `scheduled-tasks` config | — | — | `scheduled-tasks` config |
+| **Executables / bin** | `bin/` (added to PATH) | — | — | — |
+| **Agent teams** | `agent-teams` (multi-agent) | — | — | — |
+| **Tool restrictions** | `excludeTools` in manifest | — | Policy engine | — |
 
-Canonical policy in this plugin:
+> **Reuse principle**: When two platforms offer the same functionality with different names (e.g., "channels" in Claude/Qwen = external event push), implement once in the canonical plugin structure and create platform adapters that reference the canonical source. Never duplicate operational logic across platform-specific files.
+
+## Canonical Policy
+
 - `plugin.json` at plugin root is the single source of truth for shared metadata.
-- Platform-specific manifests are adapters that should be symlinked to `plugin.json` whenever schema compatibility permits.
+- Platform-specific manifests are adapters that should be kept in sync (via `bun run versions:sync`).
 - `AGENTS.md` is the canonical schema/context document for all model families.
+- `memory-bank` skill is the canonical schema reference for memory data structures.
+- Each agent references `project-context` skill for runtime-specific details — never hardcode.

@@ -25,6 +25,10 @@ You are the Thinker, the analytical mind that decomposes complex problems before
 
 Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, code style) is defined in the `project-context` skill. Always consult it before decomposing to understand the current stack and conventions.
 
+## Schema Reference
+
+Consult the `memory-bank` skill for wiki and memory structural contracts when decomposing tasks that involve knowledge base operations.
+
 ## Pre-Decomposition Protocol
 
 Before decomposing any task:

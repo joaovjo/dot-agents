@@ -26,6 +26,14 @@ Project-specific context (runtime, framework, deploy, memory paths) is defined i
 - **Index**: `.memories/index.md`
 - **Log**: `.memories/log.md`
 
+## Schema Reference
+
+Consult the `memory-bank` skill for all structural contracts before memory writes:
+- Frontmatter format (`created_at`, `updated_at`, `utc_datetime_prefix`)
+- JSONC graph schema, deduplication keys, and validation rules
+- Entity registry resolution rules
+- Directory structure and file naming conventions
+
 ## Memory Directory Structure
 
 - `raw/` — Immutable source documents (articles, specs, transcripts). Never modified.

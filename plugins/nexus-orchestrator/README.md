@@ -4,16 +4,30 @@ Agentic workflow for orchestrated software delivery with persistent LLM Wiki kno
 
 Flow: Think → Plan → Execute → Validate → Curate → Remember.
 
+## Entry Point
+
+All tasks are initiated via **`/orchestrator`** — the single user-facing command that routes to the appropriate subagent(s). No other commands are needed.
+
 ## Architecture
 
 Nexus Orchestrator implements the **LLM Wiki** pattern (inspired by [Karpathy's article](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)):
 
-### Five Memory Layers
+### Memory Layers
 1. **Raw Sources** (`.memories/raw/`) — Immutable source documents. Never modified by the LLM.
 2. **Wiki** (`.memories/wiki/`) — LLM-compiled knowledge: entity pages, concept pages, source summaries, cross-cutting synthesis.
 3. **Operational Memory** (`.memories/`) — Session records, plans, executions, errors, architecture decisions.
 4. **Infrastructure** (`.memories/infrastructure/`) — Design records for the pipeline itself (agent changes, hook config, schema evolution).
 5. **Entity Registry** (`.memories/context/entity-registry.jsonc`) — Canonical entity names with aliases to prevent duplicate entities.
+
+### Schema Contracts
+
+The `memory-bank` skill is the single source of truth for data structures:
+- Frontmatter contracts
+- JSONC graph schema and dedup keys
+- Entity registry resolution rules
+- Directory structure and naming conventions
+
+Agents reference `memory-bank` for contracts — operational procedures live in agent definitions (curator, historian).
 
 ### Structural Invariants (enforced by hooks)
 - **Frontmatter validation**: All `.memories/` markdown files require `created_at`, `updated_at`, and `utc_datetime_prefix`.
@@ -22,12 +36,20 @@ Nexus Orchestrator implements the **LLM Wiki** pattern (inspired by [Karpathy's 
 - **Raw immutability guard**: Detects and warns about writes to `.memories/raw/`.
 - **Log format enforcement**: Verifies `log.md` entries use the parseable `## [UTC] operation | title` format.
 
+Hooks use **matchers** to fire only on file-write tool calls, reducing noise during read-only operations.
+
 ### Claim Provenance
 Every wiki page claim uses provenance annotations:
 - `[!SOURCE]` — Verbatim or close paraphrase from a source
 - `[!ANALYSIS]` — Inference derived from sourced facts
 - `[!UNVERIFIED]` — Plausible claim without authoritative source
 - `[!GAP]` — Explicitly missing information
+
+### Scale-Aware Retrieval
+The curator uses adaptive retrieval based on wiki size:
+- Small (< 50 pages): full index scan
+- Medium (50-200): heading + one-liner scan, drill into top 3-5
+- Large (200+): MCP search tool or grep, then drill
 
 ### Filed-Back Queries
 Valuable query results are automatically filed back into the wiki as synthesis pages, ensuring knowledge compounds over time.
@@ -60,10 +82,10 @@ Valuable query results are automatically filed back into the wiki as synthesis p
 To avoid duplication across model ecosystems, this plugin uses:
 
 1. `plugin.json` at the plugin root as canonical shared manifest metadata.
-2. Platform manifest files as adapters, preferably symlinked to `plugin.json`.
+2. Platform manifest files as adapters, kept in sync via `bun run versions:sync`.
 3. `AGENTS.md` as the canonical cross-model schema/context file.
-
-This keeps metadata, versioning, and operational policy aligned across Claude, Copilot, Gemini, and Qwen even when each CLI uses different file names.
+4. `settings.json` ships default settings (e.g., default agent = orchestrator).
+5. `memory-bank` skill as the canonical schema reference for memory data structures.
 
 ## Local Validation and Build
 
@@ -91,25 +113,10 @@ Install from local folder:
 copilot plugin install ./dist/nexus-orchestrator-copilot
 ```
 
-List loaded plugins:
-
-```bash
-copilot plugin list
-```
-
 ## Install: Gemini CLI
-
-Install from local folder:
 
 ```bash
 gemini extensions install ./dist/nexus-orchestrator-gemini --consent --skip-settings
-```
-
-Enable or verify:
-
-```bash
-gemini extensions enable nexus-orchestrator
-gemini extensions update nexus-orchestrator
 ```
 
 ## Install: Claude Code
@@ -120,26 +127,19 @@ For local development session:
 claude --plugin-dir ./dist/nexus-orchestrator-claude
 ```
 
-When distributed through a marketplace, install with:
-
-```bash
-claude plugin install nexus-orchestrator@<marketplace>
-```
-
 ## Hooks
 
-### PostToolUse Chain (all platforms)
+### PostToolUse Chain (file-write tools only)
 1. `validate-memories-frontmatter.ts` — Frontmatter schema validation
 2. `validate-wiki-crossrefs.ts` — Broken links, orphans, backlinks, staleness scoring
 3. `entity-registry-guard.ts` — Near-duplicate entity detection
 4. `raw-immutability-guard.ts` — Raw source write detection
 5. `validate-log-format.ts` — Log format enforcement
 
-### PreToolUse Chain
-1. `guard-tool.mjs` — Tool guardian (warn mode)
-2. `raw-immutability-guard.ts` — Catches raw writes before they happen
+### PreToolUse Chain (file-write tools only)
+1. `raw-immutability-guard.ts` — Catches raw writes before they happen
 
-All hooks are **warn-only** (exit code 0) — they never block operations.
+All hooks use **matchers** and are **warn-only** (exit code 0) — they never block operations.
 
 ## Versioning
 
