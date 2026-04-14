@@ -91,6 +91,39 @@ This skill uses four complementary layers:
 - ADRs about the pipeline (not the project): `.memories/infrastructure/decisions/`
 - Schema rationale and evolution history.
 
+### 5. Entity Registry (canonical name resolution)
+- File: `.memories/context/entity-registry.jsonc`
+- Canonical entity names with aliases to prevent duplicate entities.
+- The registry is maintained by the historian and curator agents.
+- All agents should check the registry before creating new KG entities.
+
+Suggested JSONC structure:
+
+```jsonc
+{
+  // Canonical time value from horariodebrasilia.org
+  "registryGeneratedAtUtc": "2026-03-24T22:40:05-03:00",
+  "entries": [
+    {
+      "canonicalName": "orchestrator",
+      "aliases": ["nexus-orchestrator", "main-orchestrator", "orch"],
+      "entityType": "service"
+    },
+    {
+      "canonicalName": "curator",
+      "aliases": ["wiki-curator", "knowledge-curator"],
+      "entityType": "service"
+    }
+  ]
+}
+```
+
+Resolution rules:
+- `canonicalKey = entry.canonicalName.trim().toLowerCase()`
+- `aliasKey = alias.trim().toLowerCase()`
+- Before adding an entity to the KG, check if its normalized name matches any canonicalKey or aliasKey.
+- If matched, use the canonical name. If not matched, add the entity and register it.
+
 2. Knowledge Graph Index (retrieval accelerator)
 - Entity: named object (`person`, `service`, `feature`, `incident`, etc.).
 - Relation: directed link in active voice (`depends_on`, `blocked_by`, `supersedes`, etc.).

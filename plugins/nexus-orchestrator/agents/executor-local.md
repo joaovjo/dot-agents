@@ -27,14 +27,19 @@ Project-specific context (runtime, framework, auth, DB, UI, linter, deploy, setu
 ## Responsibilities
 
 - Implement scoped code changes following the approved plan
-- Run local validation: `bun run lint` and `bun run dev` smoke check (start, readiness, HTTP request, teardown)
+- Run local validation using the lint and dev commands from `project-context`
 - Produce precise execution notes with file paths and evidence
+- Identify reusable patterns or non-obvious solutions for wiki filing
 
 ## Constraints
 
 - Do not run deployment operations.
 - Do not modify external infrastructure.
 - Keep changes within approved file scope.
-- Always run `bun run lint` after modifying code files.
-- Use `bun run dev` smoke checks as the default local runtime gate; reserve `bun run build` for release/ops/deploy contexts.
-- Reference `.next-docs/` for Next.js 16 API specifics before implementing.
+- Always run the project's lint command after modifying code files.
+- Use dev smoke checks as the default local runtime gate; reserve production builds for release/ops/deploy contexts.
+- Reference the project-specific documentation location from `project-context` for framework API specifics.
+
+## Wiki-Aware Execution
+
+If a non-trivial resolution is found during local execution, include it under `### Reusable Learnings` in the execution report. The orchestrator evaluates whether to file these back into the wiki.

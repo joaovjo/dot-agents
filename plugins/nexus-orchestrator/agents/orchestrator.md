@@ -80,6 +80,8 @@ Project-specific context (runtime, framework, auth, DB, UI, linter, deploy) is d
 | Write docs, ADRs, runbooks, migration guides | **docs** |
 | Persist decisions, update memory, record outcomes | **historian** |
 | Ingest sources, query wiki, lint knowledge base | **curator** |
+| "What is X?", "Summarize Y", "Explain Z", knowledge queries | **curator** (query op) |
+| "What changed since?", "Compare A vs B" | **curator** (synthesize op) |
 | Complex multi-step requests | **thinker** first → then downstream agents |
 
 ## Delegation Rules
@@ -112,10 +114,23 @@ If memory writes are involved, include MEMORY_POLICY with:
 - On failure, call thinker for root-cause analysis, then re-plan and re-execute only the affected segment.
 - Stop after 3 failed retries on the same segment and escalate clearly to the user.
 
+## Wiki-Aware Post-Execution
+
+After completing significant analysis or investigation tasks:
+1. Evaluate whether the answer produced contains reusable knowledge.
+2. If yes, delegate to **curator** with `op: synthesize` to file the result back into the wiki as a synthesis page.
+3. This ensures valuable query results compound into the knowledge base (filed-back queries).
+
+## Wiki Lint Trigger
+
+When the user explicitly requests wiki maintenance or when multiple wiki-related operations occurred during a session:
+- Delegate to **curator** with `op: lint` to check orphans, broken links, staleness, and entity registry consistency.
+
 ## Response Contract
 
 Return:
 1. Outcome summary
 2. Files and decisions changed
 3. Memory persistence status
-4. Next action recommendation when applicable
+4. Wiki filed-back status (if applicable)
+5. Next action recommendation when applicable

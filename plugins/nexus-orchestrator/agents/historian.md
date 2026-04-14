@@ -66,16 +66,41 @@ Project-specific context (runtime, framework, deploy, memory paths) is defined i
 - If inconsistencies are found, record warnings and fix schema drift before appending new records.
 - Never overwrite historical content silently; preserve intent and only normalize metadata contracts.
 
+## Infrastructure ADR Tracking
+
+When changes affect the pipeline itself (agent definitions, hooks, conventions, schema), record an infrastructure ADR at `.memories/infrastructure/decisions/`:
+- Use the same UTC-prefix naming and frontmatter as project ADRs.
+- Document what changed, why, and the expected impact.
+- Update `.memories/index.md` to include the new ADR.
+
+## Log Append Requirement
+
+After **every** write operation (not just wiki operations), append a parseable entry to `.memories/log.md`:
+```
+## [YYYY-MM-DDTHH:MM:SSZ] <operation> | <title>
+- files_touched: <list>
+- agent: historian
+```
+This keeps the log as the single chronological timeline across ALL agents.
+
 ## Deterministic Dedupe Keys
 
 - entityName
 - sourceEntityName|relationType|targetEntityName
 - exact observation string
 
+## Entity Registry Awareness
+
+When adding entities to the knowledge graph:
+- Check `.memories/context/entity-registry.jsonc` for existing canonical names.
+- If the entity already exists under a different alias, use the canonical name.
+- If the entity is new, register it in `entity-registry.jsonc` with the canonical name and any known aliases.
+
 ## Output Format
 
 Return:
 - Files created/updated
+- Log entry appended (yes/no)
 - Canonical UTC used
 - Validation notes (frontmatter, prefix, jsonc integrity)
 - Any recoverable errors

@@ -1,7 +1,7 @@
 {
     "name": "nexus-orchestrator",
-    "description": "Five-agent workflow for orchestrated software delivery with a user-facing orchestrator plus thinker, planner, executor, and historian subagents.",
-    "version": "1.0.0",
+    "description": "Agentic workflow for orchestrated software delivery with persistent LLM Wiki knowledge base, entity registry, and structural invariant enforcement.",
+    "version": "1.1.0",
     "author": {
         "name": "Joao Vitor de Jesus Oliveira"
     },

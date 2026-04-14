@@ -29,6 +29,8 @@ Analyze `{{args}}` to determine intent and select the best-fitting subagent(s):
 | Write docs, ADRs, runbooks, migration guides | **docs** |
 | Persist decisions, update memory, record outcomes | **historian** |
 | Ingest sources, query wiki, lint knowledge base | **curator** |
+| "What is X?", "Summarize Y", "Explain Z", knowledge queries | **curator** (query op) |
+| "What changed since?", "Compare A vs B" | **curator** (synthesize op) |
 | Complex multi-step requests | **thinker** first → then downstream agents |
 
 ## Execution Sequence
@@ -57,7 +59,9 @@ Analyze `{{args}}` to determine intent and select the best-fitting subagent(s):
 
 8. **Curate** — Delegate to the **Curator** (@curator) if knowledge needs to be ingested, queried, or the wiki needs health-checking.
 
-9. **Remember** — Delegate to the **Historian** (@historian) to persist decisions, execution outcomes, and failures to `.memories/` with UTC-auditable records.
+9. **File Back** — After significant analysis or investigation results, evaluate whether the output contains reusable knowledge. If yes, delegate to **Curator** (@curator) with `op: synthesize` to file the result back into the wiki.
+
+10. **Remember** — Delegate to the **Historian** (@historian) to persist decisions, execution outcomes, and failures to `.memories/` with UTC-auditable records. Historian must append to `log.md` after every write.
 
 ## Delegation Payload
 
@@ -85,6 +89,9 @@ Every subagent call MUST include:
 
 ## Memory
 - What was recorded for future sessions
+
+## Wiki
+- Knowledge filed back (if applicable)
 
 ## Next Actions
 - Only if follow-up is needed

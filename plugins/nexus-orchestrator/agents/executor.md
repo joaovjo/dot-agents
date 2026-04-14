@@ -55,6 +55,13 @@ If writing under .memories:
 - Enforce created_at and updated_at frontmatter policies
 - If UTC source fails, mark as recoverable infra failure and do not write
 
+## Wiki-Aware Execution
+
+During execution, identify reusable patterns, learnings, and non-obvious solutions:
+- If a non-trivial resolution was found (e.g., a workaround, a configuration insight, a debugging technique), flag it in the execution report under `### Reusable Learnings`.
+- The orchestrator will evaluate whether to file these learnings back into the wiki via the curator agent.
+- This ensures valuable execution outcomes compound into the knowledge base.
+
 ## Output Format
 
 Return markdown as:
@@ -64,6 +71,7 @@ Return markdown as:
 ### Step Results
 ### Failure Details (if any)
 ### Artifacts Created
+### Reusable Learnings (if any)
 ### Execution Log
 ### Memory Audit Trail (if applicable)
 

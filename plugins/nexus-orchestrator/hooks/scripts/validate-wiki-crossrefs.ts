@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { basename, join, relative, sep } from "node:path";
+import { basename, join, sep } from "node:path";
 import { Glob } from "bun";
 
 const workspaceRoot = process.cwd();
@@ -13,11 +13,11 @@ interface ValidationResult {
 	brokenLinks: { file: string; link: string }[];
 	orphanPages: string[];
 	missingEntities: { file: string; entity: string }[];
+	missingBacklinks: { source: string; target: string }[];
+	stalePages: { page: string; staleScore: number; staleDays: number }[];
 }
 
-async function extractWikilinks(
-	content: string,
-): Promise<string[]> {
+async function extractWikilinks(content: string): Promise<string[]> {
 	const links: string[] = [];
 	let match: RegExpExecArray | null;
 	const regex = new RegExp(wikilinkPattern);
@@ -49,11 +49,25 @@ async function loadKnowledgeGraph(): Promise<Set<string>> {
 	return entities;
 }
 
+function parseFrontmatterDate(content: string, key: string): Date | null {
+	const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+	if (!fmMatch) return null;
+	const dateMatch = fmMatch[1].match(
+		new RegExp(`${key}:\\s*'([^']+)'|${key}:\\s*"([^"]+)"|${key}:\\s*(\\S+)`),
+	);
+	if (!dateMatch) return null;
+	const dateStr = dateMatch[1] || dateMatch[2] || dateMatch[3];
+	const parsed = new Date(dateStr);
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
 async function validateWikiCrossrefs(): Promise<ValidationResult> {
 	const result: ValidationResult = {
 		brokenLinks: [],
 		orphanPages: [],
 		missingEntities: [],
+		missingBacklinks: [],
+		stalePages: [],
 	};
 
 	if (!existsSync(wikiRoot)) {
@@ -64,8 +78,9 @@ async function validateWikiCrossrefs(): Promise<ValidationResult> {
 	const allPages = new Set<string>();
 	const inboundLinks = new Set<string>();
 	const fileLinks: Map<string, string[]> = new Map();
+	const pageUpdatedAt: Map<string, Date> = new Map();
 
-	// Phase 1: Scan all wiki pages and collect wikilinks
+	// Phase 1: Scan all wiki pages and collect wikilinks + metadata
 	for await (const file of glob.scan({ cwd: wikiRoot })) {
 		const normalizedPage = file.replace(/\.md$/, "").split(sep).join("/");
 		allPages.add(normalizedPage);
@@ -73,6 +88,12 @@ async function validateWikiCrossrefs(): Promise<ValidationResult> {
 		const fullPath = join(wikiRoot, file);
 		const content = await Bun.file(fullPath).text();
 		const links = await extractWikilinks(content);
+
+		// Parse updated_at for staleness scoring
+		const updatedAt = parseFrontmatterDate(content, "updated_at");
+		if (updatedAt) {
+			pageUpdatedAt.set(normalizedPage, updatedAt);
+		}
 
 		const resolvedLinks: string[] = [];
 		for (const link of links) {
@@ -139,6 +160,68 @@ async function validateWikiCrossrefs(): Promise<ValidationResult> {
 		}
 	}
 
+	// Phase 5: Bidirectionality check — if A links to B, does B link back to A?
+	const reverseLinks: Map<string, Set<string>> = new Map();
+	for (const [file, links] of fileLinks) {
+		const sourcePage = file.replace(/\.md$/, "").split(sep).join("/");
+		for (const link of links) {
+			if (!reverseLinks.has(link)) {
+				reverseLinks.set(link, new Set());
+			}
+			reverseLinks.get(link)!.add(sourcePage);
+		}
+	}
+
+	for (const [file, links] of fileLinks) {
+		const sourcePage = file.replace(/\.md$/, "").split(sep).join("/");
+		for (const link of links) {
+			if (!allPages.has(link)) continue; // Skip broken links (already reported)
+			const targetLinks = fileLinks.get(`${link.split("/").join(sep)}.md`) ??
+				fileLinks.get(`${link}.md`);
+			if (targetLinks && !targetLinks.includes(sourcePage)) {
+				// Only warn for entity/concept pages (not source/synthesis pages)
+				if (
+					sourcePage.startsWith("entities/") ||
+					sourcePage.startsWith("concepts/")
+				) {
+					result.missingBacklinks.push({
+						source: sourcePage,
+						target: link,
+					});
+				}
+			}
+		}
+	}
+
+	// Phase 6: Staleness scoring — forward-only dependency freshness
+	const now = new Date();
+	for (const [file, links] of fileLinks) {
+		const sourcePage = file.replace(/\.md$/, "").split(sep).join("/");
+		const sourceUpdated = pageUpdatedAt.get(sourcePage);
+		if (!sourceUpdated || links.length === 0) continue;
+
+		let maxDependencyUpdate: Date | null = null;
+		for (const link of links) {
+			const depUpdated = pageUpdatedAt.get(link);
+			if (depUpdated && (!maxDependencyUpdate || depUpdated > maxDependencyUpdate)) {
+				maxDependencyUpdate = depUpdated;
+			}
+		}
+
+		if (maxDependencyUpdate && maxDependencyUpdate > sourceUpdated) {
+			const staleDays = Math.floor(
+				(maxDependencyUpdate.getTime() - sourceUpdated.getTime()) / (1000 * 60 * 60 * 24),
+			);
+			if (staleDays >= 3) {
+				result.stalePages.push({
+					page: sourcePage,
+					staleScore: maxDependencyUpdate.getTime() - sourceUpdated.getTime(),
+					staleDays,
+				});
+			}
+		}
+	}
+
 	return result;
 }
 
@@ -162,6 +245,25 @@ try {
 		for (const { file, entity } of result.missingEntities) {
 			warnings.push(
 				`${file}: tag '${entity}' not found in knowledge-graph.index.jsonc`,
+			);
+		}
+	}
+
+	if (result.missingBacklinks.length > 0) {
+		for (const { source, target } of result.missingBacklinks) {
+			warnings.push(
+				`wiki/${source}.md → wiki/${target}.md: missing backlink — consider adding [[${source}]] to ${target}`,
+			);
+		}
+	}
+
+	if (result.stalePages.length > 0) {
+		// Sort by staleness descending
+		result.stalePages.sort((a, b) => b.staleDays - a.staleDays);
+		for (const { page, staleDays } of result.stalePages) {
+			const severity = staleDays > 7 ? "🔴 stale" : "⚠️ aging";
+			warnings.push(
+				`wiki/${page}.md: ${severity} (${staleDays}d behind its dependencies)`,
 			);
 		}
 	}
