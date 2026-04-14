@@ -1,0 +1,33 @@
+{
+    "name": "nexus-orchestrator",
+    "description": "Multi-agent orchestration workflow with persistent LLM Wiki knowledge base, entity registry, and structural invariant enforcement.",
+    "version": "1.2.0",
+    "author": {
+        "name": "Joao Vitor de Jesus Oliveira"
+    },
+    "repository": "https://github.com/joaovjo/dot-agents",
+    "homepage": "https://github.com/joaovjo/dot-agents/tree/main/plugins/nexus-orchestrator",
+    "license": "MIT",
+    "keywords": [
+        "agentic-workflow",
+        "orchestration",
+        "subagents",
+        "wiki",
+        "knowledge-base",
+        "memory",
+        "planning",
+        "execution"
+    ],
+    "agents": "./agents",
+    "skills": "./skills",
+    "hooks": "./hooks.json",
+    "commands": "./commands",
+    "contextFileName": "AGENTS.md",
+    "plan": {
+        "directory": "conductor/plans"
+    },
+    "excludeTools": [
+        "run_shell_command(git push)",
+        "run_shell_command(git reset --hard)"
+    ]
+}

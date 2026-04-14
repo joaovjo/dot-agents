@@ -1,13 +1,1 @@
-{
-    "name": "nexus-orchestrator",
-    "version": "1.2.0",
-    "description": "Multi-agent orchestration workflow with persistent LLM Wiki knowledge base, entity registry, and structural invariant enforcement.",
-    "contextFileName": "GEMINI.md",
-    "plan": {
-        "directory": "conductor/plans"
-    },
-    "excludeTools": [
-        "run_shell_command(git push)",
-        "run_shell_command(git reset --hard)"
-    ]
-}
+plugin.json

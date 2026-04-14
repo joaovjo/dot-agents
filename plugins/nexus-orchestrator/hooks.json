@@ -4,14 +4,6 @@
         "preToolUse": [
             {
                 "type": "command",
-                "command": "node hooks/tool-guardian/guard-tool.mjs",
-                "timeoutSec": 10,
-                "env": {
-                    "GUARD_MODE": "warn"
-                }
-            },
-            {
-                "type": "command",
                 "command": "bun hooks/scripts/raw-immutability-guard.ts",
                 "timeoutSec": 10
             }
@@ -31,6 +23,11 @@
                 "type": "command",
                 "command": "bun hooks/scripts/entity-registry-guard.ts",
                 "timeoutSec": 15
+            },
+            {
+                "type": "command",
+                "command": "bun hooks/scripts/raw-immutability-guard.ts",
+                "timeoutSec": 10
             },
             {
                 "type": "command",

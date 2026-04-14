@@ -1,8 +1,12 @@
 # Nexus Orchestrator
 
-See `AGENTS.md` for workflow overview and agent index.
-See `agents/` for individual agent definitions.
-See `skills/project-context/SKILL.md` for project-specific configuration.
+Canonical schema and context for this extension lives in `AGENTS.md`.
+
+Use these files as primary references:
+- `AGENTS.md` for workflow, structure, and cross-CLI mapping.
+- `agents/` for agent definitions.
+- `skills/project-context/SKILL.md` for project-specific runtime metadata.
+- `plugin.json` for canonical extension metadata and shared policy.
 
 ## Safety Defaults
 

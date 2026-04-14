@@ -26,10 +26,15 @@ Use the `/nexus` command to start an orchestrated workflow:
 
 ## Architecture
 
-See `AGENTS.md` for workflow overview and agent index.
-See `agents/` for individual agent definitions with YAML frontmatter.
-See `skills/` for modular capabilities (memory-bank, project-context, sequential-thinking).
-See `hooks/hooks.qwen.json` for event-driven enforcement hooks.
+Canonical schema and context for this extension lives in `AGENTS.md`.
+
+Use these files as primary references:
+- `AGENTS.md` for workflow overview, conventions, and cross-CLI feature mapping.
+- `agents/` for individual agent definitions with YAML frontmatter.
+- `skills/` for modular capabilities (memory-bank, project-context, sequential-thinking).
+- `hooks.json` for event-driven validation hooks.
+
+The extension metadata is centralized in `plugin.json` at the plugin root.
 
 ## License
 

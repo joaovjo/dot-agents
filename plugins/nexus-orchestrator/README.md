@@ -55,6 +55,16 @@ Valuable query results are automatically filed back into the wiki as synthesis p
 - Claude Code plugin
 - Qwen Code integration
 
+## Single Source Of Truth
+
+To avoid duplication across model ecosystems, this plugin uses:
+
+1. `plugin.json` at the plugin root as canonical shared manifest metadata.
+2. Platform manifest files as adapters, preferably symlinked to `plugin.json`.
+3. `AGENTS.md` as the canonical cross-model schema/context file.
+
+This keeps metadata, versioning, and operational policy aligned across Claude, Copilot, Gemini, and Qwen even when each CLI uses different file names.
+
 ## Local Validation and Build
 
 From repository root:
@@ -135,7 +145,7 @@ All hooks are **warn-only** (exit code 0) — they never block operations.
 
 Version source of truth:
 
-- `plugins/nexus-orchestrator/.plugin/plugin.json`
+- `plugins/nexus-orchestrator/plugin.json`
 
 Sync all target manifests and marketplace metadata:
 

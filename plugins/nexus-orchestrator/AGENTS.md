@@ -53,3 +53,20 @@ Response to user
 - **Log**: Append parseable entry to `.memories/log.md` after every write
 - **Wiki immutability**: `.memories/raw/` is immutable — never modify source files
 - **Provenance**: Annotate claims with type (Source, Analysis, Unverified, Gap)
+
+## Cross-CLI Capability Map
+
+Some ecosystems expose equivalent capabilities with different names. Prefer this map to avoid duplicated implementation logic:
+
+| Capability | Claude | Copilot VS Code | Gemini CLI | Qwen Code |
+|---|---|---|---|---|
+| Agent definitions | `agents/` | `agents/` | `agents/` (subagents) | `agents/` |
+| Specialized workflows | `skills/` | `skills/` | `skills/` | `skills/` |
+| Lifecycle automation | `hooks/hooks.json` | `hooks.json` (or Claude-format auto-detected) | `hooks/hooks.json` | Hook-like automation through extension/runtime configuration |
+| Context bootstrap file | `CLAUDE.md` | Agent/plugin instructions | `GEMINI.md` or `contextFileName` | `QWEN.md` or `contextFileName` |
+| External tools | `.mcp.json` | `.mcp.json` | `mcpServers` in `gemini-extension.json` | `mcpServers` in extension manifest |
+
+Canonical policy in this plugin:
+- `plugin.json` at plugin root is the single source of truth for shared metadata.
+- Platform-specific manifests are adapters that should be symlinked to `plugin.json` whenever schema compatibility permits.
+- `AGENTS.md` is the canonical schema/context document for all model families.
